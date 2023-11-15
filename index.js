@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const paymentService = require('./services/paymentService.js');
 const Database = require('./database.js');
 const config = require('./config.json');
-const MessageEmbedError = require("./utils/MessageEmbedError.js");
+const MessageEmbedUtil = require('./utils/MessageEmbedUtil.js');
 const app = express()
 const port = 80
 
@@ -39,7 +39,7 @@ app.post('/notifications', async (req, res) => {
         paymentService.handleNotification(body);
         res.send('Ok');
     } catch (error) {
-        const embed = MessageEmbedError.create("**Erro ao processar webhook**", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
+        const embed = MessageEmbedUtil.create("**Erro ao processar webhook**","error", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
         client.channels.cache.get(client.config.adminChannel).send({embeds: [embed]});
         res.status(500).send('Internal Server Error');
     }

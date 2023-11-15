@@ -1,6 +1,6 @@
 const {MessageEmbed} = require("discord.js");
 const subsRepository = require('../../repositories/subsRepository.js');
-const MessageEmbedError = require('../../utils/MessageEmbedError.js');
+const MessageEmbedUtil = require('../../utils/MessageEmbedUtil.js');
 
 module.exports = {
     name: "ip",
@@ -12,7 +12,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, message, args) => {
-        const erro = MessageEmbedError.create("Uso incorreto", "!ip <script> <ip>");
+        const erro = MessageEmbedUtil.create("Uso incorreto", "error", "!ip <script> <ip>");
         if (! args[0] || !args[1]) return message.channel.send({embeds: [erro]});
 
         const script = await subsRepository.findByNameAndDiscordId(args[0], message.author.id);

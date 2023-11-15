@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const subs = require("./subs");
 const subsRepository = require("../../repositories/subsRepository");
-const MessageEmbedSuccess = require("../../utils/MessageEmbedSuccess");
+const MessageEmbedUtil = require("../../utils/MessageEmbedUtil");
 const scriptRepository = require("../../repositories/scriptRepository");
 
 module.exports = {
@@ -66,7 +66,7 @@ module.exports = {
           name: "Nome:  " + script.script,
           value: "IP: " + (script.ip ? script.ip : "Nenhum")
         }));
-        const embed = MessageEmbedSuccess.create("Assinaturas", null, fields);
+        const embed = MessageEmbedUtil.create("Assinaturas", null, null, fields);
         return message.channel.send({ embeds: [embed] });
       default:
         return message.channel.send(

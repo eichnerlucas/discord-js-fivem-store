@@ -1,6 +1,6 @@
 
 const subsRepository = require('../../repositories/subsRepository.js');
-const MessageEmbedSuccess = require('../../utils/MessageEmbedSuccess.js');
+const MessageEmbedUtil = require('../../utils/MessageEmbedUtil.js');
 
 module.exports = {
     name: "subs",
@@ -21,7 +21,7 @@ module.exports = {
             name: "Nome:  " + script.script,
             value: "IP: " + (script.ip ? script.ip : "Nenhum")
         }));
-        const embed = MessageEmbedSuccess.create("Assinaturas",null, fields);
+        const embed = MessageEmbedUtil.create("Assinaturas", null, null, fields);
         return message.channel.send({embeds: [embed]});
     }
 }

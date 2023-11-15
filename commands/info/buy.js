@@ -3,8 +3,7 @@ const {
   MessageSelectMenu,
 } = require("discord.js");
 const scriptRepository = require("../../repositories/scriptRepository");
-const MessageEmbedError = require("../../utils/MessageEmbedError.js");
-const MessageEmbedSuccess = require("../../utils/MessageEmbedSuccess.js");
+const MessageEmbedUtil = require("../../utils/MessageEmbedUtil");
 
 module.exports = {
   name: "buy",
@@ -16,7 +15,7 @@ module.exports = {
    * @param {String[]} args
    */
   run: async (client, message, args) => {
-    const erro = MessageEmbedError.create("Uso incorreto", "!buy <script>");
+    const erro = MessageEmbedUtil.create("Uso incorreto", "error", "!buy <script>");
     if (!args[0]) {
       return message.channel.send({ embeds: [erro] });
     }
@@ -83,8 +82,9 @@ module.exports = {
               },
             ])
         );
-        const embed = MessageEmbedSuccess.create(
+        const embed = MessageEmbedUtil.create(
           args[0],
+          null,
           `Olá.\nAgradecemos por estar realizando o pedido de **${args[0]}**.\nEscolha um dos métodos de pagamento listado abaixo.\n\n**Métodos de Pagamento**\n- MercadoPago\n- PIX\n\nApós efetuar o pagamento, realize uma captura de tela e envie aqui no canal junto com o seu **nome e email**.\n\n**Para fechar este ticket, reaja com 🔒.**`
         );
         channel.send({ embeds: [embed], components: [helpMenu] });

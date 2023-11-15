@@ -1,6 +1,6 @@
 const { Message, Client, MessageEmbed } = require("discord.js");
 const scriptsRepository = require("../../repositories/scriptRepository");
-const MessageEmbedSuccess = require("../../utils/MessageEmbedSuccess.js");
+const MessageEmbedUtil = require("../../utils/MessageEmbedUtil");
 
 module.exports = {
     name: "scripts",
@@ -22,7 +22,7 @@ module.exports = {
             name: script.name,
             value: "Valor: R$" + script.price,
         }));
-        const embed = MessageEmbedSuccess.create(`Scripts (${scripts.length})`, null, fields);
+        const embed = MessageEmbedUtil.create(`Scripts (${scripts.length})`, null, null, fields);
 
         return message.channel.send({embeds: [embed]})
     }
