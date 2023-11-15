@@ -23,7 +23,7 @@ client.on("interactionCreate", async (interaction) => {
         if ( interaction.values[0] === "pix" ) {
             await interaction.deferUpdate()
             // Obtenha a data e hora atual com o fuso horário desejado
-            const now = moment().tz('America/New_York');
+            const now = moment().tz('America/Sao_Paulo');
 
             // Adicione 30 minutos à data atual
             const futureDate = now.add(30, 'minutes');
