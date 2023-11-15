@@ -21,7 +21,7 @@ module.exports = class Database {
     return result;
   }
 
-  async getScriptByDiscordId(discord_id) {
+  async getSubsByDiscordId(discord_id) {
     const result = await this.query(`SELECT script, ip FROM subs WHERE discord_id = ?`, [discord_id]);
     return result;
   }
@@ -48,5 +48,9 @@ module.exports = class Database {
 
   async createSubscription(discord_id, script) {
     return await this.query(`INSERT INTO subs (discord_id, script) VALUES("${discord_id}", "${script}")`)
+  }
+  
+  async deleteSubscriptionByDiscordIdAndScript(discord_id, script) {
+    return await this.query(`DELETE FROM subs WHERE discord_id = "${discord_id}" AND script = "${script}"`)
   }
 };

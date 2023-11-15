@@ -1,4 +1,8 @@
 const { MessageEmbed } = require("discord.js");
+const subs = require("./subs");
+const subsRepository = require("../../repositories/subsRepository");
+const MessageEmbedSuccess = require("../../utils/MessageEmbedSuccess");
+const scriptRepository = require("../../repositories/scriptRepository");
 
 module.exports = {
   name: "sub",
@@ -10,110 +14,63 @@ module.exports = {
    * @param {String[]} args
    */
   run: async (client, message, args) => {
-    if ( !client.config.donos.includes(message.author.id) ) return message.reply("você não é um dos meus criadores!");
+    if (!client.config.donos.includes(message.author.id)) return message.reply("você não é um dos meus criadores!");
 
-    if ( !args[0] ) return message.reply("**Use !sub <argumento> <@pessoa>**");
+    if (!args[0]) return message.reply("**Use !sub <argumento> <@pessoa>**");
     switch (args[0]) {
       case "add":
-        if ( !args[1] || !args[2] || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>` ) return message.reply("**Use !sub add <script> <@pessoa>**");
-        await client.db.query(
-            `SELECT script FROM subs WHERE discord_id = "${
-                message.mentions.users.first().id
-            }" AND script = "${args[1]}"`,
-            async (err, rows) => {
-              if ( rows && rows.length >= 1 ) {
-                return message.channel.send(`:x: **Assinatura já encontrada!** `)
-              }
+        if (!args[1] || !args[2] || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>`) return message.reply("**Use !sub add <script> <@pessoa>**");
+        const scriptArgs = await scriptRepository.findByName(args[1]);
 
-              if ( !rows || rows.length === 0 ) {
-                let role = message.guild.roles.cache.find(
-                    (r) => r.name === "Cliente"
-                );
-                let usuario = message.mentions.members.first();
-                usuario.roles.add(role).catch(console.error);
-                await client.db.query(
-                    `INSERT INTO subs (discord_id, script) VALUES("${
-                        message.mentions.users.first().id
-                    }", "${args[1]}")`,
-                    async (err, rows) => {
-                      if ( rows.affectedRows === 1 ) {
-                        return message.channel.send(
-                            `:white_check_mark: **Assinatura adicionada!** `
-                        );
-                      }
-                    }
-                );
-              }
-            }
+        if (!scriptArgs) {
+          return message.channel.send(`:x: **Este script não existe!** `)
+        }
+
+        const scriptAdd = await subsRepository.findByNameAndDiscordId(args[1], message.mentions.users.first().id);
+
+        if (scriptAdd) {
+          return message.channel.send(`:x: **Assinatura já encontrada!** `)
+        }
+
+        let role = message.guild.roles.cache.find(
+          (r) => r.name === "Cliente"
         );
+        let usuario = message.mentions.members.first();
+        usuario.roles.add(role).catch(console.error);
+        const add = await subsRepository.createSubscription(message.mentions.users.first().id, args[1]);
+        message.channel.send(`:white_check_mark: **Assinatura adicionada com sucesso!** `);
         break;
       case "remove":
-        if ( !args[1] || !args[2] || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>` ) return message.reply("**Use !sub remove <script> <@pessoa>**");
-        await client.db.query(
-            `SELECT script, ip FROM subs WHERE discord_id = "${
-                message.mentions.users.first().id
-            }" AND script = "${args[1]}"`,
-            async (err, rows) => {
-              if ( !rows || rows.length === 0 ) {
-                return message.channel.send(
-                    `:x: **Assinatura não encontrada!** `
-                );
-              }
-              if ( rows.length >= 1 ) {
-                await client.db.query(
-                    `DELETE FROM subs WHERE discord_id = "${
-                        message.mentions.users.first().id
-                    }" AND script = "${args[1]}"`,
-                    async (err, rows) => {
-                      if ( !rows.affectedRows ) {
-                        return message.channel.send(
-                            `:x: **Ocorreu um erro, contate um Administrador!** `
-                        );
-                      }
-                      if ( rows.affectedRows >= 1 ) {
-                        return message.channel.send(
-                            `:white_check_mark: **Assinatura removida!** `
-                        );
-                      }
-                    }
-                );
-              }
-            }
-        );
-        break;
+        if (!args[1] || !args[2] || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>`) return message.reply("**Use !sub remove <script> <@pessoa>**");
+        const script = await subsRepository.findByNameAndDiscordId(args[1], message.mentions.users.first().id);
+
+        if (!script) {
+          return message.channel.send(`:x: **Assinatura não encontrada!** `)
+        }
+
+        const deleted = await subsRepository.deleteSubscriptionByDiscordIdAndScript(message.mentions.users.first().id, args[1]);
+
+        if (!deleted) {
+          return message.channel.send(`:x: **Ocorreu um erro ao remover a assinatura!** `)
+        }
+
+        return message.channel.send(`:white_check_mark: **Assinatura removida com sucesso!** `);
       case "list":
-        if ( !args[1] || !message.mentions.users.first().id ) return message.reply("**Use !sub list <@pessoa>**");
-        await client.db.query(
-            `SELECT script, ip FROM subs WHERE discord_id = ${
-                message.mentions.users.first().id
-            }`,
-            async (err, rows) => {
-              if ( err ) throw err;
-              if ( !rows || rows.length === 0 ) {
-                return message.channel.send(
-                    `:x: **Este usuário não possui scripts!** `
-                );
-              }
-              const embed = new MessageEmbed()
-                  .setTitle(`Assinaturas (${rows.length})`)
-                  .setColor(0x00ae86)
-                  .addField(
-                      `Nome`,
-                      rows.map((x) => x.script),
-                      true
-                  )
-                  .addField(
-                      `IP`,
-                      rows.map((x) => (x.ip ? x.ip : "Nenhum")),
-                      true
-                  );
-              return message.channel.send({embeds: [embed]});
-            }
-        );
-        break;
+        if (!args[1] || !message.mentions.users.first() || !message.mentions.users.first().id) return message.reply("**Use !sub list <@pessoa>**");
+        const scripts = await subsRepository.findByDiscordId(message.mentions.users.first().id);
+
+        if (!scripts) {
+          return message.channel.send(`:x: **Nenhuma assinatura encontrada!**`);
+        }
+        const fields = scripts.map((script) => ({
+          name: "Nome:  " + script.script,
+          value: "IP: " + (script.ip ? script.ip : "Nenhum")
+        }));
+        const embed = MessageEmbedSuccess.create("Assinaturas", null, fields);
+        return message.channel.send({ embeds: [embed] });
       default:
         return message.channel.send(
-            `:x: **Não encontrei ${args[0]} dentro do comando sub!** `
+          `:x: **Não encontrei ${args[0]} dentro do comando sub!** `
         );
     }
   }

@@ -16,7 +16,7 @@ module.exports = {
     findByDiscordId: async (discord_id) => {
         const client = require('../index');
 
-        const script = await client.db.getScriptByDiscordId(discord_id);
+        const script = await client.db.getSubsByDiscordId(discord_id);
         return script
     },
 
@@ -24,6 +24,13 @@ module.exports = {
         const client = require('../index');
         
         const result = await client.db.createSubscription(discord_id, script);
+        return result
+    },
+
+    deleteSubscriptionByDiscordIdAndScript: async (discord_id, script) => {
+        const client = require('../index');
+        
+        const result = await client.db.deleteSubscriptionByDiscordIdAndScript(discord_id, script);
         return result
     }
 };
