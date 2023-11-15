@@ -1,4 +1,4 @@
-const { Client, Collection } = require("discord.js");
+const { Client, Collection, MessageEmbed } = require("discord.js");
 const express = require('express');
 const bodyParser = require('body-parser');
 const paymentService = require('./services/paymentService.js');
@@ -30,8 +30,21 @@ require("./handler")(client);
 client.login(client.config.token);
 
 app.post('/notifications', async (req, res) => {
-    paymentService.handleNotification(client, req.body);
-    res.send('Ok');
+    try {
+        const { body } = req;
+        paymentService.handleNotification(client, body);
+        res.send('Ok');
+    } catch (error) {
+        console.log(error);
+        const embed = new MessageEmbed()
+            .setTitle(`**Erro ao processar webhook**`)
+            .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
+            .setDescription(`**Ocorreu um erro ao processar o webhook**:\n\`\`${error}\`\` \n**Req Body:** \n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``)
+            .setColor(0x00ae86)
+            .setTimestamp();
+        client.channels.cache.get(client.config.adminChannel).send({embeds: [embed]});
+        res.status(500).send('Error');
+    }
 })
 
 
