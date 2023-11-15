@@ -43,6 +43,10 @@ module.exports = class Database {
   
   async getPaymentById(id) {
     const result = await this.query(`SELECT * FROM payments WHERE payment_id = ?`, [id]);
-    return result[0];
+    return result;
+  }
+
+  async createSubscription(discord_id, script) {
+    return await this.query(`INSERT INTO subs (discord_id, script) VALUES("${discord_id}", "${script}")`)
   }
 };

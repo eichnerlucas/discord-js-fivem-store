@@ -1,6 +1,6 @@
 const mercadopago = require("../utils/mercadopago");
 const paymentRepository = require("../repositories/paymentRepository");
-const client = require('../index');
+const subsRepository = require("../repositories/subsRepository");
 
 const discordMessages = {
     approved: "<@${discord_id}>, seu pagamento já foi encontrado e sua licença para o script **${script}** já foi gerada, para verificar utilize o comando **!subs**.",
@@ -22,6 +22,8 @@ const updateDatabase = async (payment_id, status) => {
 // Função para enviar mensagem no canal do Discord
 const sendDiscordMessage = (channel_id, message) => {
     try {
+        const client = require('../index');
+
         const channel = client.channels.cache.get(channel_id);
         channel.send(message);
         console.log('Discord message sent:', message);
@@ -33,7 +35,7 @@ const sendDiscordMessage = (channel_id, message) => {
 
 const createSubscription = (discord_id, script) => {
     try {
-        client.db.query(`INSERT INTO subs (discord_id, script) VALUES("${discord_id}", "${script}")`)
+        const subscription = subsRepository.createSubscription(discord_id, script);
         console.log('Subscription created:', script);
     } catch (error) {
         console.error('Error creating subscription:', error);
@@ -55,10 +57,10 @@ module.exports = {
 
             const paymentReq = await mercadopago.payment.findById(payment_id);
 
-            if (paymentReq.response.status === "pending") {
-                console.log('Payment is pending, returning...');
-                return;
-            }
+            // if (paymentReq.response.status === "pending") {
+            //     console.log('Payment is pending, returning...');
+            //     return;
+            // }
 
             const discordId = payment[0].discord_id;
             const script = payment[0].script;
