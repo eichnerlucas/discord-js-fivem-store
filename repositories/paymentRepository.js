@@ -9,7 +9,6 @@ module.exports = {
             if (!rows || rows.length === 0) {
                 return callback(null, null);
             }
-            console.log(rows)
             callback(null, rows);
         });
     },

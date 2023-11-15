@@ -2,6 +2,8 @@ const { Client, Collection, MessageEmbed } = require("discord.js");
 const express = require('express');
 const bodyParser = require('body-parser');
 const paymentService = require('./services/paymentService.js');
+const Database = require('./database.js');
+const config = require('./config.json');
 const app = express()
 const port = 80
 
@@ -20,9 +22,7 @@ client.commands = new Collection();
 client.slashCommands = new Collection();
 client.config = require("./config.json");
 
-const MysqlManager = require('./database.js');
-
-new MysqlManager(client, client.config); //Inicia a database, e salva ela no client
+client.db = new Database(config.database.user, config.database.password, config.database.name, config.database.host); //Inicia a database, e salva ela no client
 
 // Initializing the project
 require("./handler")(client);

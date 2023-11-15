@@ -14,7 +14,7 @@ module.exports = {
         if ( !client.config.donos.includes(message.author.id) ) return message.reply("você não é um dos meus criadores!");
         
         if (! args[0] || ! args[1])
-            return message.channel.send(':x: **Use !create <script> <valor> <arquivo>**');
+            return message.channel.send(':x: **Use !create <script> <valor> e anexe um arquivo!**');
         
         if (! message.attachments.first())
             return message.channel.send(':x: **Anexe o arquivo do script!**');

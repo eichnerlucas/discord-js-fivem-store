@@ -1,18 +1,18 @@
 const client = require('../index');
 
 module.exports = {
-    findByNameAndDiscordId: (name, discord_id, callback) => {
-        client.db.query(`SELECT script FROM subs WHERE discord_id = ? AND script = ?`, [discord_id, name], (err, rows) => {
-            if (err) {
-                console.error('Error in findByNameAndDiscordId:', err);
-                return callback(err, null);
-            }
+    findByNameAndDiscordId: async (name, discord_id) => {
+        const script = await client.db.getSubsByDiscordIdAndScriptName(name, discord_id);
+        return script
+    },
 
-            if (!rows || rows.length === 0) {
-                return callback(null, null);
-            }
-        
-            callback(null, rows);
-        });
+    updateIp: async (discord_id, script, ip) => {
+        const result = await client.db.updateSubsIp(discord_id, script, ip);
+        return result
+    },
+
+    findByDiscordId: async (discord_id) => {
+        const script = await client.db.getScriptByDiscordId(discord_id);
+        return script
     },
 };

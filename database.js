@@ -1,18 +1,38 @@
-const { createConnection } = require("mysql");
+const { createConnection } = require('mysql');
+const { promisify } = require('util');
 
-module.exports = class MysqlManager {
-  constructor(client, config) {
-    this.client = client;
-    this.config = config;
-    this.db = createConnection({
-      host: this.config.database.host,
-      port: this.config.database.port,
-      user: this.config.database.user,
-      password: this.config.database.password,
-      database: this.config.database.name,
-      charset: "utf8mb4",
-    });
-    this.client.db = this.db;
-    this.client.db.connect();
+module.exports = class Database {
+
+  constructor(user, password, database, host) {
+    Database.instance = this;
+
+    this.db = createConnection({ user, password, database, host });
+    this.db.connect();
+    this.query = promisify(this.db.query.bind(this.db));
+  }
+
+  async getScriptName(name) {
+    const result = await this.query(`SELECT * FROM scripts WHERE name = ?`, [name]);
+    return result[0];
+  }
+
+  async getAllScripts() {
+    const result = await this.query(`SELECT * FROM scripts`);
+    return result;
+  }
+
+  async getScriptByDiscordId(discord_id) {
+    const result = await this.query(`SELECT script, ip FROM subs WHERE discord_id = ?`, [discord_id]);
+    return result;
+  }
+
+  async getSubsByDiscordIdAndScriptName(name, discord_id) {
+    const result = await this.query(`SELECT script FROM subs WHERE discord_id = ? AND script = ?`, [discord_id, name]);
+    return result[0];
+  }
+
+  async updateSubsIp(discord_id, script, ip) {
+    const result = await this.query(`UPDATE subs SET ip = ? WHERE discord_id = ? AND script = ?`, [ip, discord_id, script]);
+    return result;
   }
 };

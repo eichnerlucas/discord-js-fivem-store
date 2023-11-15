@@ -111,50 +111,50 @@ client.on("interactionCreate", async (interaction) => {
             })
         }
 
-        if ( interaction.values[0] === "cartao" ) {
-            await interaction.deferUpdate()
-            const preference = {
-                items: [
-                    {
-                        title: rows[0].name,
-                        quantity: 1,
-                        currency_id: 'BRL',
-                        unit_price: rows[0].price
-                    }
-                ],
-                external_reference : randString(20),
-            };
-            await interaction.message.edit({components: []})
+        // if ( interaction.values[0] === "cartao" ) {
+        //     await interaction.deferUpdate()
+        //     const preference = {
+        //         items: [
+        //             {
+        //                 title: rows[0].name,
+        //                 quantity: 1,
+        //                 currency_id: 'BRL',
+        //                 unit_price: rows[0].price
+        //             }
+        //         ],
+        //         external_reference : randString(20),
+        //     };
+        //     await interaction.message.edit({components: []})
 
-            const generating = new MessageEmbed()
-                .setTitle(`**Aguarde**`)
-                .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png' })
-                .setDescription("**Processando pagamento...**")
-                .setColor(0x00ae86)
-                .setTimestamp();
-            await interaction.editReply({embeds: [generating]})
-            let mp = interaction.message.guild.emojis.cache?.find(emoji => emoji.name === 'mercadopago');
-            await mercadopago.preferences.create(preference).then(res => {
-               console.log(res.response)
-                client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, script, price, status, type) VALUES (${interaction.user.id}, ${interaction.channelId}, "${res.response.external_reference}", "${name}", "${price}", "pending", "creditcard")`)
-                const embed = new MessageEmbed()
-                    .setTitle(`**Pagamento Gerado com Sucesso**`)
-                    .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-                    .setDescription(`**Nome do Produto:** \`\`${name}\`\`\n\n**Valor:** \`\`R$${price}\`\`\n\n**Método de Pagamento: ** ${mp} MercadoPago\n\n**🛈**: O pagamento expira em **2 dias**, antes de efetuar o pagamento verifique se ele ainda está disponível.`)
-                    .setColor(0x00ae86)
-                    .setTimestamp();
+        //     const generating = new MessageEmbed()
+        //         .setTitle(`**Aguarde**`)
+        //         .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png' })
+        //         .setDescription("**Processando pagamento...**")
+        //         .setColor(0x00ae86)
+        //         .setTimestamp();
+        //     await interaction.editReply({embeds: [generating]})
+        //     let mp = interaction.message.guild.emojis.cache?.find(emoji => emoji.name === 'mercadopago');
+        //     await mercadopago.preferences.create(preference).then(res => {
+        //        console.log(res.response)
+        //         client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, script, price, status, type) VALUES (${interaction.user.id}, ${interaction.channelId}, "${res.response.external_reference}", "${name}", "${price}", "pending", "creditcard")`)
+        //         const embed = new MessageEmbed()
+        //             .setTitle(`**Pagamento Gerado com Sucesso**`)
+        //             .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
+        //             .setDescription(`**Nome do Produto:** \`\`${name}\`\`\n\n**Valor:** \`\`R$${price}\`\`\n\n**Método de Pagamento: ** ${mp} MercadoPago\n\n**🛈**: O pagamento expira em **2 dias**, antes de efetuar o pagamento verifique se ele ainda está disponível.`)
+        //             .setColor(0x00ae86)
+        //             .setTimestamp();
 
-                const button = new MessageActionRow()
-                    .addComponents(
-                        new MessageButton()
-                            .setLabel('Link de Pagamento')
-                            .setURL(`${res.body.init_point}`)
-                            .setStyle('LINK')
-                    );
-                interaction.editReply({embeds: [embed], components: [button]})
-            }).catch(error => {
-                console.log(error)
-            })
-        }
+        //         const button = new MessageActionRow()
+        //             .addComponents(
+        //                 new MessageButton()
+        //                     .setLabel('Link de Pagamento')
+        //                     .setURL(`${res.body.init_point}`)
+        //                     .setStyle('LINK')
+        //             );
+        //         interaction.editReply({embeds: [embed], components: [button]})
+        //     }).catch(error => {
+        //         console.log(error)
+        //     })
+        // }
     })
 });
