@@ -27,12 +27,10 @@ client.db = new Database(config.database.user, config.database.password, config.
 // Initializing the project
 require("./handler")(client);
 
-client.login(client.config.token);
-
 app.post('/notifications', async (req, res) => {
     try {
         const { body } = req;
-        paymentService.handleNotification(client, body);
+        paymentService.handleNotification(body);
         res.send('Ok');
     } catch (error) {
         console.log(error);
@@ -47,6 +45,7 @@ app.post('/notifications', async (req, res) => {
     }
 })
 
-
 app.listen(port, () => console.log(`App listening on port ${port}!`))
+
+client.login(client.config.token);
 

@@ -1,5 +1,6 @@
 const mercadopago = require("../utils/mercadopago");
 const paymentRepository = require("../repositories/paymentRepository");
+const client = require('../index');
 
 const discordMessages = {
     approved: "<@${discord_id}>, seu pagamento já foi encontrado e sua licença para o script **${script}** já foi gerada, para verificar utilize o comando **!subs**.",
@@ -8,9 +9,9 @@ const discordMessages = {
 };
 
 // Função para atualizar o banco de dados com o status do pagamento
-const updateDatabase = async (client, payment_id, status) => {
+const updateDatabase = async (payment_id, status) => {
     try {
-        client.db.query('UPDATE payments SET status = ? WHERE payment_id = ?', [status, payment_id]);
+        await paymentRepository.updateStatus(payment_id, status);
         console.log(`Database updated for payment_id: ${payment_id} - Status: ${status}`);
     } catch (error) {
         console.error('Error updating database:', error);
@@ -19,7 +20,7 @@ const updateDatabase = async (client, payment_id, status) => {
 };
 
 // Função para enviar mensagem no canal do Discord
-const sendDiscordMessage = (client, channel_id, message) => {
+const sendDiscordMessage = (channel_id, message) => {
     try {
         const channel = client.channels.cache.get(channel_id);
         channel.send(message);
@@ -30,7 +31,7 @@ const sendDiscordMessage = (client, channel_id, message) => {
     }
 };
 
-const createSubscription = (client, discord_id, script) => {
+const createSubscription = (discord_id, script) => {
     try {
         client.db.query(`INSERT INTO subs (discord_id, script) VALUES("${discord_id}", "${script}")`)
         console.log('Subscription created:', script);
@@ -42,41 +43,37 @@ const createSubscription = (client, discord_id, script) => {
 
 
 module.exports = {
-    handleNotification: async (client, req) => {
-        const payment_id = req.data.id;
-
+    handleNotification: async (req) => {
         try {
+            const payment_id = req.data.id;
 
             if (! payment_id || req.action === "payment.created" ) {
                 return null;
             }
 
-            paymentRepository.findById(client, payment_id, async (err, rows) =>{
+            const payment = await paymentRepository.findById(payment_id)
 
-                const payment = await mercadopago.payment.findById(payment_id);
+            const paymentReq = await mercadopago.payment.findById(payment_id);
 
-                if (payment.response.status === "pending") {
-                    console.log('Payment is pending, returning...');
-                    return;
-                }
+            if (paymentReq.response.status === "pending") {
+                console.log('Payment is pending, returning...');
+                return;
+            }
 
-                const discordId = rows[0].discord_id;
-                const script = rows[0].script;
+            const discordId = payment[0].discord_id;
+            const script = payment[0].script;
 
-                // Atualizar o banco de dados com o status do pagamento
-                await updateDatabase(client, payment_id, payment.response.status);
+            // Atualizar o banco de dados com o status do pagamento
+            await updateDatabase(payment_id, paymentReq.response.status);
 
-                // Enviar mensagem no canal do Discord com o status do pagamento
-                let discordMessage = discordMessages[payment.response.status];
+            // Enviar mensagem no canal do Discord com o status do pagamento
+            let discordMessage = discordMessages[paymentReq.response.status];
 
-                discordMessage = discordMessage.replace("${discord_id}", discordId).replace("${script}", script);
+            discordMessage = discordMessage.replace("${discord_id}", discordId).replace("${script}", script);
 
-                sendDiscordMessage(client, rows[0].channel_id, discordMessage);
+            sendDiscordMessage(payment[0].channel_id, discordMessage);
 
-                createSubscription(client, discordId, script)
-            })
-
-            
+            createSubscription(discordId, script);
         } catch (error) {
             console.error(error);
         }

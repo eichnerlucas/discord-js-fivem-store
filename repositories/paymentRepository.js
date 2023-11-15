@@ -1,15 +1,13 @@
-module.exports = {
-    findById: (client, id, callback) => {
-        client.db.query(`SELECT * FROM payments WHERE payment_id = ?`, [id], (err, rows) => {
-            if (err) {
-                console.error('Error in findById:', err);
-                return callback(err, null);
-            }
+const client = require('../index');
 
-            if (!rows || rows.length === 0) {
-                return callback(null, null);
-            }
-            callback(null, rows);
-        });
+module.exports = {
+    findById: async (id) => {
+        console.log(client.db)
+        const payment = await client.db.getPaymentById(id);
+        return payment[0]
     },
+
+    updateStatus: async (payment_id, status) => {
+        return await client.db.updatePaymentStatus(payment_id, status);
+    }
 };

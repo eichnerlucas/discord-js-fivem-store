@@ -2,6 +2,7 @@ const client = require('../index');
 
 module.exports = {
     findByNameAndDiscordId: async (name, discord_id) => {
+        console.log(client.db)
         const script = await client.db.getSubsByDiscordIdAndScriptName(name, discord_id);
         return script
     },

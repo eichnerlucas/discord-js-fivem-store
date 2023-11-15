@@ -11,7 +11,7 @@ module.exports = class Database {
     this.query = promisify(this.db.query.bind(this.db));
   }
 
-  async getScriptName(name) {
+  async getScriptByName(name) {
     const result = await this.query(`SELECT * FROM scripts WHERE name = ?`, [name]);
     return result[0];
   }
@@ -34,5 +34,15 @@ module.exports = class Database {
   async updateSubsIp(discord_id, script, ip) {
     const result = await this.query(`UPDATE subs SET ip = ? WHERE discord_id = ? AND script = ?`, [ip, discord_id, script]);
     return result;
+  }
+
+  async updatePaymentStatus(payment_id, status) {
+    const result = await this.query(`UPDATE payments SET status = ? WHERE payment_id = ?`, [status, payment_id]);
+    return result;
+  }
+  
+  async getPaymentById(id) {
+    const result = await this.query(`SELECT * FROM payments WHERE payment_id = ?`, [id]);
+    return result[0];
   }
 };

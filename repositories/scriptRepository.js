@@ -2,8 +2,8 @@ const client = require('../index');
 
 module.exports = {
     findByName: async (name) => {
-        const script = await client.db.getScriptName(name);
-        return script[0]
+        const script = await client.db.getScriptByName(name);
+        return script
     },
 
     findAll: async () => {
