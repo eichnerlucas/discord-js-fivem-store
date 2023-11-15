@@ -35,7 +35,7 @@ const sendDiscordMessage = (channel_id, message) => {
 
 const createSubscription = (discord_id, script) => {
     try {
-        const subscription = subsRepository.createSubscription(discord_id, script);
+        subsRepository.createSubscription(discord_id, script);
         console.log('Subscription created:', script);
     } catch (error) {
         console.error('Error creating subscription:', error);
@@ -49,7 +49,7 @@ module.exports = {
         try {
             const payment_id = req.data.id;
 
-            if (!payment_id || req.action === "payment.created" ) {
+            if (!payment_id || req.action === "payment.created") {
                 return null;
             }
 
@@ -77,7 +77,7 @@ module.exports = {
 
             createSubscription(discordId, script);
         } catch (error) {
-            console.error(error);
+            throw error;
         }
     },
 };
