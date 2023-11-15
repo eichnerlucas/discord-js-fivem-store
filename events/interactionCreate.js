@@ -2,6 +2,7 @@ const { MessageEmbed, MessageAttachment, MessageActionRow, MessageButton} = requ
 const client = require("../index");
 const mercadopago = require("../utils/mercadopago");
 const randString = require("../utils/generateString.js");
+const moment = require('moment-timezone');
 
 client.on("interactionCreate", async (interaction) => {
     // Select Menu Handling
@@ -21,12 +22,20 @@ client.on("interactionCreate", async (interaction) => {
         const { name, price } = rows[0];
         if ( interaction.values[0] === "pix" ) {
             await interaction.deferUpdate()
+            // Obtenha a data e hora atual com o fuso horário desejado
+            const now = moment().tz('America/New_York');
+
+            // Adicione 30 minutos à data atual
+            const futureDate = now.add(30, 'minutes');
+
+            // Formate a data no formato especificado
+            const formattedDate = futureDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
             const payment_data = {
                 transaction_amount: price,
                 description: name,
                 payment_method_id: 'pix',
                 external_reference : randString(20),
-                // date_of_expiration: date,
+                date_of_expiration: formattedDate,
                 payer: {
                     email: 'ricardina6539@uorak.com',
                     identification: {
@@ -126,7 +135,8 @@ client.on("interactionCreate", async (interaction) => {
             await interaction.editReply({embeds: [generating]})
             let mp = interaction.message.guild.emojis.cache?.find(emoji => emoji.name === 'mercadopago');
             await mercadopago.preferences.create(preference).then(res => {
-                client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, script, status, type) VALUES (${interaction.user.id}, ${interaction.channelId}, "${res.response.external_reference}", "${name}", "${price}", "pending", "creditcard")`)
+               console.log(res.response)
+                client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, script, price, status, type) VALUES (${interaction.user.id}, ${interaction.channelId}, "${res.response.external_reference}", "${name}", "${price}", "pending", "creditcard")`)
                 const embed = new MessageEmbed()
                     .setTitle(`**Pagamento Gerado com Sucesso**`)
                     .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })

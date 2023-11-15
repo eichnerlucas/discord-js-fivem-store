@@ -22,25 +22,25 @@ USE `phoenixbot`;
 -- Copiando estrutura para tabela phoenixbot.payments
 CREATE TABLE IF NOT EXISTS `payments` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `discord_id` varchar(50) DEFAULT NULL,
-  `channel_id` varchar(50) DEFAULT NULL,
-  `payment_id` varchar(50) DEFAULT NULL,
-  `script` varchar(50) DEFAULT NULL,
-  `status` varchar(50) DEFAULT NULL,
+  `discord_id` varchar(50) NOT NULL,
+  `channel_id` varchar(50) NOT NULL,
+  `payment_id` varchar(50) NOT NULL,
+  `script` varchar(50) NOT NULL,
+  `status` varchar(50) NOT NULL,
   `type` varchar(50) DEFAULT NULL,
   `external_ref` varchar(50) DEFAULT NULL,
-  `price` float DEFAULT NULL,
+  `price` float NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Exportação de dados foi desmarcado.
 
 -- Copiando estrutura para tabela phoenixbot.scripts
 CREATE TABLE IF NOT EXISTS `scripts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) DEFAULT NULL,
-  `price` float DEFAULT NULL,
-  `is_active` int(11) DEFAULT 1,
+  `name` varchar(50) NOT NULL,
+  `price` float NOT NULL,
+  `is_active` int(11) NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

@@ -88,12 +88,12 @@ module.exports = {
                     value: "pix",
                     emoji: pix,
                   },
-                //   {
-                //     label: "MercadoPago",
-                //     description: "Método de Pagamento Brasileiro (Cartão)",
-                //     value: "cartao",
-                //     emoji: mp,
-                //   },
+                  // {
+                  //   label: "MercadoPago",
+                  //   description: "Método de Pagamento Brasileiro (Cartão)",
+                  //   value: "cartao",
+                  //   emoji: mp,
+                  // },
                 ])
             );
             const embed = new MessageEmbed()
