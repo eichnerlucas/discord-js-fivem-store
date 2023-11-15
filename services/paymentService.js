@@ -47,7 +47,7 @@ module.exports = {
         try {
             const payment_id = req.data.id;
 
-            if (! payment_id || req.action === "payment.created" ) {
+            if (!payment_id || req.action === "payment.created" ) {
                 return null;
             }
 
