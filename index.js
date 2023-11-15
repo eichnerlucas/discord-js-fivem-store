@@ -39,7 +39,7 @@ app.post('/notifications', async (req, res) => {
         const embed = new MessageEmbed()
             .setTitle(`**Erro ao processar webhook**`)
             .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-            .setDescription(`**Ocorreu um erro ao processar o webhook**:\n\`\`${error}\`\` \n**Req Body:** \n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``)
+            .setDescription(`**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``)
             .setColor(0x00ae86)
             .setTimestamp();
         client.channels.cache.get(client.config.adminChannel).send({embeds: [embed]});
