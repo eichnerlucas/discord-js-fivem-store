@@ -28,17 +28,17 @@ module.exports = {
                 return message.channel.send(`:x: **Script não encontrado!** `);
             }
 
-            fs.statSync(`./arquivos/${args[0]}.zip`, (error, exists) => {
+            fs.statSync(`./files/${args[0]}.zip`, (error, exists) => {
                 if (error) console.log(error);
                 if (! exists) {
                     return message.channel.send(":x: **Arquivo não encontrado, contate um administrador!**")
                 }
-                fs.unlinkSync(`./arquivos/${args[0]}.zip`, (err) => {
+                fs.unlinkSync(`./files/${args[0]}.zip`, (err) => {
                     if (err) throw err;
                 });
             })
 
-            request(message.attachments.first().url).pipe(fs.createWriteStream(`./arquivos/${args[0]}.zip`))
+            request(message.attachments.first().url).pipe(fs.createWriteStream(`./files/${args[0]}.zip`))
 
             client.db.query(`UPDATE scripts SET price = ${args[1]} WHERE name = "${args[0]}"`, async (err, rows) => {
                 if (rows.affectedRows >= 1) {

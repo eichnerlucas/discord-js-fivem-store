@@ -19,7 +19,7 @@ module.exports = {
         if (! message.attachments.first())
             return message.channel.send(':x: **Anexe o arquivo do script!**');
 
-        request(message.attachments.first().url).pipe(fs.createWriteStream('./arquivos/' + args[0] + '.zip'))
+        request(message.attachments.first().url).pipe(fs.createWriteStream('./files/' + args[0] + '.zip'))
 
         client.db.query(`INSERT INTO scripts (name, price) VALUES("${args[0]}", ${args[1]})`, async (err, rows) => {
             if (rows.affectedRows >= 1) {

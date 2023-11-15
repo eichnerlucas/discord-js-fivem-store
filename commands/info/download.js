@@ -21,12 +21,12 @@ module.exports = {
             return message.channel.send(`:x: Você não possui o script **${args[0]}**, contate um administrador caso ache que isso seja um engano.`);
         }
 
-        fs.stat(`./arquivos/${args[0]}.zip`, (error, exists) => {
+        fs.stat(`./files/${args[0]}.zip`, (error, exists) => {
             if (error) console.log(error);
             if (! exists) {
                 return message.channel.send(":x: **Arquivo não encontrado, contate um administrador!**")
             }
-            const scriptAtt = new MessageAttachment(`./arquivos/${args[0]}.zip`, `${args[0]}.zip`)
+            const scriptAtt = new MessageAttachment(`./files/${args[0]}.zip`, `${args[0]}.zip`)
             message.channel.send(":white_check_mark: **Download enviado no seu privado!**")
             message.author.send({files: [scriptAtt]})
         });

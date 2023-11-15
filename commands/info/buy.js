@@ -23,7 +23,7 @@ module.exports = {
     //     return message.reply('Você já tem um ticket criado, feche o antigo para abrir um novo!');
     // }
     const script = await scriptRepository.findByName(args[0]);
-    console.log(script);
+
     if (!script) {
       return message.channel.send(`:x: **Este script não existe!**`);
     }
