@@ -1,9 +1,10 @@
 const {
-  MessageEmbed,
   MessageActionRow,
   MessageSelectMenu,
 } = require("discord.js");
 const scriptRepository = require("../../repositories/scriptRepository");
+const MessageEmbedError = require("../../utils/MessageEmbedError.js");
+const MessageEmbedSuccess = require("../../utils/MessageEmbedSuccess.js");
 
 module.exports = {
   name: "buy",
@@ -15,11 +16,7 @@ module.exports = {
    * @param {String[]} args
    */
   run: async (client, message, args) => {
-    const erro = new MessageEmbed()
-      .setTitle(`Uso incorreto`)
-      .setDescription(`!buy <script>`)
-      .setColor(0x00ae86)
-      .setTimestamp();
+    const erro = MessageEmbedError.create("Uso incorreto", "!buy <script>");
     if (!args[0]) {
       return message.channel.send({ embeds: [erro] });
     }
@@ -70,11 +67,7 @@ module.exports = {
         let pix = message.guild.emojis.cache?.find(
           (emoji) => emoji.name === "pix"
         );
-        let mp = message.guild.emojis.cache?.find(
-          (emoji) => emoji.name === "mercadopago"
-        );
         pix ? pix : '💰';
-        mp ? mp : '💳';
         let helpMenu = new MessageActionRow().addComponents(
           new MessageSelectMenu()
             .setCustomId("buy_menu")
@@ -88,21 +81,12 @@ module.exports = {
                 value: "pix",
                 emoji: pix,
               },
-              // {
-              //   label: "MercadoPago",
-              //   description: "Método de Pagamento Brasileiro (Cartão)",
-              //   value: "cartao",
-              //   emoji: mp,
-              // },
             ])
         );
-        const embed = new MessageEmbed()
-          .setTitle(args[0])
-          .setDescription(
-            `Olá.\nAgradecemos por estar realizando o pedido de **${args[0]}**.\nEscolha um dos métodos de pagamento listado abaixo.\n\n**Métodos de Pagamento**\n- MercadoPago\n- PIX\n\nApós efetuar o pagamento, realize uma captura de tela e envie aqui no canal junto com o seu **nome e email**.\n\n**Para fechar este ticket, reaja com 🔒.**`
-          )
-          .setColor(0x00ae86)
-          .setTimestamp();
+        const embed = MessageEmbedSuccess.create(
+          args[0],
+          `Olá.\nAgradecemos por estar realizando o pedido de **${args[0]}**.\nEscolha um dos métodos de pagamento listado abaixo.\n\n**Métodos de Pagamento**\n- MercadoPago\n- PIX\n\nApós efetuar o pagamento, realize uma captura de tela e envie aqui no canal junto com o seu **nome e email**.\n\n**Para fechar este ticket, reaja com 🔒.**`
+        );
         channel.send({ embeds: [embed], components: [helpMenu] });
       });
   },

@@ -1,5 +1,6 @@
-const { MessageEmbed } = require('discord.js');
+
 const subsRepository = require('../../repositories/subsRepository.js');
+const MessageEmbedSuccess = require('../../utils/MessageEmbedSuccess.js');
 
 module.exports = {
     name: "subs",
@@ -20,10 +21,7 @@ module.exports = {
             name: "Nome:  " + script.script,
             value: "IP: " + (script.ip ? script.ip : "Nenhum")
         }));
-        const embed = new MessageEmbed()
-            .setTitle(`Assinaturas (${subscriptions.length})`)
-            .setColor(0x00ae86)
-            .addFields(fields)
+        const embed = MessageEmbedSuccess.create("Assinaturas",null, fields);
         return message.channel.send({embeds: [embed]});
     }
 }

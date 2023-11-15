@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const paymentService = require('./services/paymentService.js');
 const Database = require('./database.js');
 const config = require('./config.json');
+const MessageEmbedError = require("./utils/MessageEmbedError.js");
 const app = express()
 const port = 80
 
@@ -38,15 +39,9 @@ app.post('/notifications', async (req, res) => {
         paymentService.handleNotification(body);
         res.send('Ok');
     } catch (error) {
-        console.log(error);
-        const embed = new MessageEmbed()
-            .setTitle(`**Erro ao processar webhook**`)
-            .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-            .setDescription(`**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``)
-            .setColor(0x00ae86)
-            .setTimestamp();
+        const embed = MessageEmbedError.create("**Erro ao processar webhook**", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
         client.channels.cache.get(client.config.adminChannel).send({embeds: [embed]});
-        res.status(500).send('Error');
+        res.status(500).send('Internal Server Error');
     }
 })
 
