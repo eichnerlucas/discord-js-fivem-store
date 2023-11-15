@@ -19,7 +19,7 @@ module.exports = {
     if (!args[0]) return message.reply("**Use !sub <argumento> <@pessoa>**");
     switch (args[0]) {
       case "add":
-        if (!args[1] || !args[2] || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>`) return message.reply("**Use !sub add <script> <@pessoa>**");
+        if (!args[1] || !args[2] || !message.mentions.users.first() || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>`) return message.reply("**Use !sub add <script> <@pessoa>**");
         const scriptArgs = await scriptRepository.findByName(args[1]);
 
         if (!scriptArgs) {
@@ -41,7 +41,7 @@ module.exports = {
         message.channel.send(`:white_check_mark: **Assinatura adicionada com sucesso!** `);
         break;
       case "remove":
-        if (!args[1] || !args[2] || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>`) return message.reply("**Use !sub remove <script> <@pessoa>**");
+        if (!args[1] || !args[2] || !message.mentions.users.first() || !message.mentions.users.first().id || args[2] !== `<@${message.mentions.users.first().id}>`) return message.reply("**Use !sub remove <script> <@pessoa>**");
         const script = await subsRepository.findByNameAndDiscordId(args[1], message.mentions.users.first().id);
 
         if (!script) {
