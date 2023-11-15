@@ -15,14 +15,19 @@ const client = new Client({
     intents: 32767,
 });
 
-module.exports = client;
-
 // Global Variables
 client.commands = new Collection();
 client.slashCommands = new Collection();
 client.config = require("./config.json");
 
-client.db = new Database(config.database.user, config.database.password, config.database.name, config.database.host); //Inicia a database, e salva ela no client
+const databaseData = {
+    host: config.database.host,
+    user: config.database.user,
+    password: config.database.password,
+    database: config.database.name
+}
+
+client.db = new Database(databaseData); //Inicia a database, e salva ela no client
 
 // Initializing the project
 require("./handler")(client);
@@ -48,4 +53,6 @@ app.post('/notifications', async (req, res) => {
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
 client.login(client.config.token);
+
+module.exports = client;
 

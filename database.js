@@ -3,10 +3,10 @@ const { promisify } = require('util');
 
 module.exports = class Database {
 
-  constructor(user, password, database, host) {
+  constructor(data) {
     Database.instance = this;
 
-    this.db = createConnection({ user, password, database, host });
+    this.db = createConnection(data);
     this.db.connect();
     this.query = promisify(this.db.query.bind(this.db));
   }
