@@ -4,4 +4,4 @@ Handler for discord.js version 13
 
 `node index.js` - start the project
 
-Only open pull requests for bug fixes, I want to keep the code as clean as possible, thanks!
+I'm open to review and accept all pull requests, be my guest to submit yours, thanks!
