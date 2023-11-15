@@ -53,12 +53,7 @@ async function handleInteraction(interaction) {
     
         const react = await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
         if (! react) {
-            const errorEmbed = new MessageEmbed()
-                .setTitle(`**Erro ao Gerar Pedido**`)
-                .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png' })
-                .setDescription(`**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro**:\n\`\`${error.cause[0].description}\`\``)
-                .setColor(0x00ae86)
-                .setTimestamp();
+            const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
             interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
         }
         const filter = i => i.customId === 'cancel-pix' && i.user.id === interaction.user.id;
