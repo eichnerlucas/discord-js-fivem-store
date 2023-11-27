@@ -18,6 +18,7 @@ const client = new Client({
 
 // Global Variables
 client.commands = new Collection();
+client.interactions = new Collection();
 client.slashCommands = new Collection();
 client.config = require("./config.json");
 
@@ -50,4 +51,8 @@ app.listen(port, () => console.log(`App listening on port ${port}!`))
 client.login(client.config.token);
 
 module.exports = client;
+
+// Handles errors and avoids crashes, better to not remove them.
+process.on('unhandledRejection', console.error);
+process.on('uncaughtException', console.error);
 

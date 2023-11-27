@@ -25,4 +25,15 @@ module.exports = async (client) => {
     const eventFiles = await globPromise(`${process.cwd()}/events/*.js`);
     eventFiles.map((value) => require(value));
 
+    // Buttons (ou outros elementos de interação com customId)
+    const interactionFiles = await globPromise(`${process.cwd()}/interactions/**/*.js`);
+    interactionFiles.map((value) => {
+    const file = require(value);
+
+    if (file.customId && file.customId) {
+        console.log(`Loading interaction: ${file.customId}`)
+      client.interactions.set(file.customId, file);
+    }
+  });
+
 };

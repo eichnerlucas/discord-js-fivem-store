@@ -1,16 +1,15 @@
 
 const { MessageEmbed, MessageAttachment, MessageActionRow, MessageButton } = require("discord.js");
-const mercadopago = require("../utils/mercadopago");
-const randString = require("../utils/generateString.js");
+const mercadopago = require("../../utils/mercadopago.js");
+const randString = require("../../utils/generateString.js");
 const moment = require('moment-timezone');
-const scriptRepository = require("../repositories/scriptRepository");
-const client = require("../index");
-const MessageEmbedUtil = require("../utils/MessageEmbedUtil");
-const moneyFormat = require("../utils/moneyFormat");
+const scriptRepository = require("../../repositories/scriptRepository.js");
+const client = require("../../index");
+const MessageEmbedUtil = require("../../utils/MessageEmbedUtil.js");
+const moneyFormat = require("../../utils/moneyFormat.js");
 
-async function handleInteraction(interaction) {
+async function run(interaction) {
     try {
-        interaction.message.embeds[0].title
         const script = await scriptRepository.findByName(interaction.message.embeds[0].title);
     
         if (! script) {
@@ -103,5 +102,6 @@ function createPayment(name, price) {
 
 // Export the handler function
 module.exports = {
-  handleInteraction
+    customId: "buy_menu",
+    run
 };

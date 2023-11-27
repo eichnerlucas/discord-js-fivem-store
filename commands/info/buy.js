@@ -59,7 +59,7 @@ module.exports = {
           },
         ],
         type: "text",
-        parent: "870979800532140114",
+        parent: client.config.ticketParentId,
       })
       .then(async (channel) => {
         message.channel.send(`:white_check_mark: **Pedido criado!**`);
