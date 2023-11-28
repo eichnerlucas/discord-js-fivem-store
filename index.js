@@ -19,6 +19,7 @@ const client = new Client({
 // Global Variables
 client.commands = new Collection();
 client.interactions = new Collection();
+client.interactionsData = new Collection();
 client.slashCommands = new Collection();
 client.config = require("./config.json");
 

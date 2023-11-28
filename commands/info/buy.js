@@ -69,7 +69,7 @@ module.exports = {
         pix ? pix : '💰';
         let helpMenu = new MessageActionRow().addComponents(
           new MessageSelectMenu()
-            .setCustomId("buy_menu")
+            .setCustomId("buy-menu")
             .setPlaceholder("Escolha uma opcao")
             .setMinValues(1)
             .setMaxValues(1)

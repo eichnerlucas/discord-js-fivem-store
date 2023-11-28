@@ -47,27 +47,22 @@ async function run(interaction) {
                 new MessageButton()
                     .setCustomId('cancel-pix')
                     .setLabel('Cancelar Pagamento')
-                    .setStyle('DANGER'),
+                    .setStyle('DANGER')
+                    .setDisabled(false)
+                    .setEmoji('🚫')
             );
     
-    
+        const buttonData = {
+            paymentId: res.response.id,
+        };
+
+        client.interactionsData.set('cancel-pix', buttonData);
+
         const react = await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
         if (! react) {
             const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
             interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
         }
-        const filter = i => i.customId === 'cancel-pix' && i.user.id === interaction.user.id;
-        const collector = react.createMessageComponentCollector({ filter, time: 1800000 });
-        collector.on('collect', async (collected) => {
-            if (collected.customId === 'cancel-pix') {
-                await collected.deferUpdate()
-                const response = await mercadopago.payment.cancel(res.response.id)
-                const { status, external_reference } = response.response
-                client.db.query(`UPDATE payments SET status = "${status}" WHERE external_ref = "${external_reference}";`)
-                const canceled = MessageEmbedUtil.create("**Pedido cancelado com sucesso**", "success", `**Lamentamos que não tenha dado tudo certo na sua compra, esperamos vê-lo em breve...**`);
-                interaction.editReply({ embeds: [canceled], components: [], files: [] })
-            }
-        })
     } catch (error) {
         const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
         interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
@@ -102,6 +97,6 @@ function createPayment(name, price) {
 
 // Export the handler function
 module.exports = {
-    customId: "buy_menu",
+    customId: "buy-menu",
     run
 };
