@@ -56,8 +56,7 @@ async function run(interaction) {
             paymentId: res.response.id,
         };
 
-        client.interactionsData.set('cancel-pix', buttonData);
-
+        client.interactionsData.set(`cancel-pix:${interaction.message.channelId}`, buttonData);
         const react = await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
         if (! react) {
             const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
