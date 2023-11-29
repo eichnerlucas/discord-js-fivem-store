@@ -1,6 +1,7 @@
 const client = require("../../index");
 const mercadopago = require("../../utils/mercadopago.js");
 const MessageEmbedUtil = require("../../utils/MessageEmbedUtil.js");
+const paymentRepository = require("../../repositories/paymentRepository.js");
 
 async function run(interaction) {
     try {
@@ -17,7 +18,7 @@ async function run(interaction) {
         const response = await mercadopago.payment.cancel(paymentId);
         const { status, external_reference } = response.response;
     
-        client.db.query('UPDATE payments SET status = ? WHERE external_ref = ?;', [status, external_reference]);
+        paymentRepository.updateStatusByExternalRef(external_reference, status);
     
         const canceled = MessageEmbedUtil.create("**Pedido cancelado com sucesso**", "success", `**Lamentamos que não tenha dado tudo certo na sua compra, esperamos vê-lo em breve...**`);
     

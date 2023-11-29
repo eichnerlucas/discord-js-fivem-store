@@ -57,11 +57,7 @@ async function run(interaction) {
         };
 
         client.interactionsData.set(`cancel-pix:${interaction.message.channelId}`, buttonData);
-        const react = await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
-        if (! react) {
-            const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
-            interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
-        }
+        await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
     } catch (error) {
         const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
         interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })

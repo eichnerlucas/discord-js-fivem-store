@@ -10,5 +10,11 @@ module.exports = {
         const client = require('../index');
 
         return await client.db.updatePaymentStatus(payment_id, status);
+    },
+
+    updateStatusByExternalRef: async(external_ref, status) => {
+        const client = require('../index');
+
+        return await client.db.updatePaymentStatusByExternalRef(external_ref, status);
     }
 };
