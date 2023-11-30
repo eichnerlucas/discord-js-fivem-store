@@ -83,11 +83,35 @@ module.exports = {
             ])
         );
         const embed = MessageEmbedUtil.create(
-          args[0],
+          "**Pedido de Compra**",
           null,
-          `Olá.\nAgradecemos por estar realizando o pedido de **${args[0]}**.\nEscolha um dos métodos de pagamento listado abaixo.\n\n**Métodos de Pagamento**\n- MercadoPago\n- PIX\n\nApós efetuar o pagamento, realize uma captura de tela e envie aqui no canal junto com o seu **nome e email**.\n\n**Para fechar este ticket, reaja com 🔒.**`
+          `Olá <@${message.author.id}>.\nAgradecemos por estar realizando o pedido de **${args[0]}**.\nEscolha um dos métodos de pagamento listado abaixo.\n\n**Métodos de Pagamento**\n- MercadoPago\n- PIX\n\nApós efetuar o pagamento, realize uma captura de tela e envie aqui no canal junto com o seu **nome e email**.\n\n**Para fechar este ticket, reaja com 🔒.**`
         );
-        channel.send({ embeds: [embed], components: [helpMenu] });
+        const sentMessage = await channel.send({ content: `<@${message.author.id}>`,embeds: [embed], components: [helpMenu] });
+
+        // Adicione um ouvinte de eventos para esperar a reação de cadeado
+        const filter = (reaction, user) => reaction.emoji.name === '🔒' && user.id === message.author.id;
+        const collector = sentMessage.createReactionCollector({ filter });
+
+        collector.on('collect', async (reaction, user) => {
+          const newParentID = '1179909201854734407'; 
+          const newParent = message.guild.channels.cache.get(newParentID);
+        
+          if (newParent) {
+            await channel.send('Este ticket será fechado em 1 minuto.');
+            setTimeout(async () => {
+              // Coloque aqui o código para mover o canal e remover o acesso do usuário
+              await channel.edit({ parent: newParent });
+              await channel.permissionOverwrites.edit(message.author.id, {
+                SEND_MESSAGES: false,
+                VIEW_CHANNEL: false,
+                READ_MESSAGE_HISTORY: false,
+              });
+            }, 60000);
+          } else {
+            await channel.send('Erro: O novo parent não foi encontrado. O ticket não será movido.');
+          }
+        });
       });
   },
 };

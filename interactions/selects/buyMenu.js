@@ -38,7 +38,7 @@ async function run(interaction) {
         const embed = new MessageEmbed()
             .setTitle(`**Pagamento Gerado com Sucesso**`)
             .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-            .setDescription(`**Nome do Produto:** \`\`${name}\`\`\n\n**Valor:** \`\`R$${moneyFormat(price)}\`\`\n\n**Método de Pagamento: ** 💰 Pix\n\n**Código PIX:** \`\`${qr_code}\`\`\n\n**🛈**: O pagamento expira em **30 minutos**, antes de efetuar o pagamento verifique se ele ainda está disponível.`)
+            .setDescription(`**Nome do Produto:** \`\`${name}\`\`\n\n**Valor:** \`\`${moneyFormat(price)}\`\`\n\n**Método de Pagamento: ** 💰 Pix\n\n**Código PIX:** \`\`${qr_code}\`\`\n\n**🛈**: O pagamento expira em **30 minutos**, antes de efetuar o pagamento verifique se ele ainda está disponível.`)
             .setColor(0x00ae86)
             .setImage(`attachment://${payload.external_reference}.png`)
             .setTimestamp();

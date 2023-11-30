@@ -29,7 +29,7 @@ async function run(interaction) {
             files: []
         });
     
-        client.interactionsData.delete(interaction.customId + `:${interaction.channelId}`);
+        client.interactionsData.delete(interaction.customId + `:${interaction.message.channelId}`);
     } catch (error) {
         const errorEmbed = MessageEmbedUtil.create("**Erro ao Cancelar Pagamento**", "error", `**Ocorreu um erro ao cancelar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
         interaction.editReply({ embeds: [errorEmbed], components: [], files: [] });

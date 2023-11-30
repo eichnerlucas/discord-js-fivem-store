@@ -21,7 +21,7 @@ module.exports = {
 
         const fields = scripts.map((script) => ({
             name: script.name,
-            value: "Valor: R$" + moneyFormat(script.price),
+            value: "Valor: " + moneyFormat(script.price),
         }));
         const embed = MessageEmbedUtil.create(`Scripts (${scripts.length})`, null, null, fields);
 

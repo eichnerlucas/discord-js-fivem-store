@@ -1,6 +1,7 @@
 const mercadopago = require("../utils/mercadopago");
 const paymentRepository = require("../repositories/paymentRepository");
 const subsRepository = require("../repositories/subsRepository");
+const MessageEmbed = require("../utils/MessageEmbed");
 
 const discordMessages = {
     approved: "<@${discord_id}>, seu pagamento já foi encontrado e sua licença para o script **${script}** já foi gerada, para verificar utilize o comando **!subs**.",
@@ -20,12 +21,22 @@ const updateDatabase = async (payment_id, status) => {
 };
 
 // Função para enviar mensagem no canal do Discord
-const sendDiscordMessage = (channel_id, message) => {
+const sendDiscordMessage = async (channel_id, message) => {
     try {
         const client = require('../index');
 
         const channel = client.channels.cache.get(channel_id);
-        channel.send(message);
+
+        const messages = await channel.messages.fetch({ limit: 1 });
+
+        const botMessage = messages.filter(msg => msg.author.id === client.user.id);
+
+        if (! botMessage) {
+            return message.reply('Não foi possível encontrar a última mensagem enviada pelo bot.');
+        }
+
+        const embed = MessageEmbed("**Pagamento aprovado!**", "success", message);
+        await botMessage.edit({ embeds: [embed], files: [], components: [] });
         console.log('Discord message sent:', message);
     } catch (error) {
         console.error('Error sending Discord message:', error);
@@ -55,7 +66,7 @@ module.exports = {
 
             const payment = await paymentRepository.findById(payment_id)
 
-            const paymentReq = await mercadopago.payment.findById(payment_id);
+            const paymentMP = await mercadopago.payment.findById(payment_id);
 
             // if (paymentReq.response.status === "pending") {
             //     console.log('Payment is pending, returning...');
@@ -66,14 +77,14 @@ module.exports = {
             const script = payment[0].script;
 
             // Atualizar o banco de dados com o status do pagamento
-            await updateDatabase(payment_id, paymentReq.response.status);
+            await updateDatabase(payment_id, paymentMP.response.status);
 
             // Enviar mensagem no canal do Discord com o status do pagamento
-            let discordMessage = discordMessages[paymentReq.response.status];
+            let discordMessage = discordMessages[paymentMP.response.status];
 
             discordMessage = discordMessage.replace("${discord_id}", discordId).replace("${script}", script);
 
-            sendDiscordMessage(payment[0].channel_id, discordMessage);
+            sendDiscordMessage(payment[0].channel_id, paymentMP.response.status);
 
             createSubscription(discordId, script);
         } catch (error) {
