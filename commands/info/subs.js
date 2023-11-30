@@ -1,6 +1,6 @@
 
 const subsRepository = require('../../repositories/subsRepository.js');
-const MessageEmbedUtil = require('../../utils/MessageEmbedUtil.js');
+const MessageEmbedUtil = require('../../utils/MessageEmbed.js');
 
 module.exports = {
     name: "subs",

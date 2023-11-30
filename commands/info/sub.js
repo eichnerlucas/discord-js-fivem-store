@@ -1,7 +1,7 @@
 const { MessageEmbed } = require("discord.js");
 const subs = require("./subs");
 const subsRepository = require("../../repositories/subsRepository");
-const MessageEmbedUtil = require("../../utils/MessageEmbedUtil");
+const MessageEmbedUtil = require("../../utils/MessageEmbed");
 const scriptRepository = require("../../repositories/scriptRepository");
 
 module.exports = {

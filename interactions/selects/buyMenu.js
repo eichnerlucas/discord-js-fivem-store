@@ -5,7 +5,7 @@ const randString = require("../../utils/generateString.js");
 const moment = require('moment-timezone');
 const scriptRepository = require("../../repositories/scriptRepository.js");
 const client = require("../../index");
-const MessageEmbedUtil = require("../../utils/MessageEmbedUtil.js");
+const MessageEmbedUtil = require("../../utils/MessageEmbed.js");
 const moneyFormat = require("../../utils/moneyFormat.js");
 
 async function run(interaction) {
