@@ -1,6 +1,6 @@
 const client = require("../../index");
 const mercadopago = require("../../utils/mercadopago.js");
-const MessageEmbedUtil = require("../../utils/MessageEmbedUtil.js");
+const MessageEmbedUtil = require("../../utils/MessageEmbed.js");
 const paymentRepository = require("../../repositories/paymentRepository.js");
 
 async function run(interaction) {

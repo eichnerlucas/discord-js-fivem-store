@@ -3,7 +3,7 @@ const {
   MessageSelectMenu,
 } = require("discord.js");
 const scriptRepository = require("../../repositories/scriptRepository");
-const MessageEmbedUtil = require("../../utils/MessageEmbedUtil");
+const MessageEmbedUtil = require("../../utils/MessageEmbed");
 
 module.exports = {
   name: "buy",

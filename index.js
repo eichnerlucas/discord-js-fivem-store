@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const paymentService = require('./services/paymentService.js');
 const Database = require('./database.js');
 const config = require('./config.json');
-const MessageEmbedUtil = require('./utils/MessageEmbedUtil.js');
+const MessageEmbedUtil = require('./utils/MessageEmbed.js');
 const app = express()
 const port = 80
 
