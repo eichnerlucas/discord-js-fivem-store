@@ -7,6 +7,7 @@ const config = require('./config.json');
 const MessageEmbedUtil = require('./utils/MessageEmbed.js');
 const app = express()
 const port = 80
+const expiredPayments = require('./schedules/expiredPayments.js');
 
 // Configurar o middleware Body Parser
 app.use(bodyParser.json());
@@ -46,6 +47,8 @@ app.post('/notifications', async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 })
+
+expiredPayments()
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 

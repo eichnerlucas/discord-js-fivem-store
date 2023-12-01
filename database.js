@@ -44,6 +44,10 @@ module.exports = class Database {
     return await this.query(`SELECT * FROM payments WHERE payment_id = ?`, [id]);
   }
 
+  async getAllPaymentsPending() {
+    return await this.query(`SELECT * FROM payments WHERE status = "pending"`);
+  }
+
   async createSubscription(discord_id, script) {
     return await this.query(`INSERT INTO subs (discord_id, script) VALUES(?, ?)`, [discord_id, script])
   }

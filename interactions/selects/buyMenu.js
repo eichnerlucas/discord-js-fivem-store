@@ -23,7 +23,9 @@ async function run(interaction) {
         await interaction.editReply({ embeds: [generating] })
     
         const { name, price } = script;
-        const payload = createPayment(name, price)
+        const now = moment().tz('America/Sao_Paulo');
+        const futureDate = now.add(30, 'minutes');
+        const payload = createPayment(name, price, futureDate)
 
         const res = await mercadopago.payment.create(payload)
     
@@ -32,7 +34,7 @@ async function run(interaction) {
             interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
         }
     
-        client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, external_ref, script, price, status, type, expire_date) VALUES (${interaction.user.id}, ${interaction.channelId}, ${res.response.id},"${res.response.external_reference}", "${name}", "${price}","pending", "pix", ${payload.date_of_expiration})`)
+        client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, external_ref, script, price, status, type, expire_date) VALUES (${interaction.user.id}, ${interaction.channelId}, ${res.response.id},"${res.response.external_reference}", "${name}", "${price}","pending", "pix", "${futureDate}");`)
         const { qr_code, qr_code_base64 } = res.response.point_of_interaction.transaction_data
         const file = new MessageAttachment(new Buffer.from(qr_code_base64, 'base64'), `${payload.external_reference}.png`);
         const embed = new MessageEmbed()
@@ -64,10 +66,8 @@ async function run(interaction) {
     }
 }
 
-function createPayment(name, price) {
-    const now = moment().tz('America/Sao_Paulo');
-    const futureDate = now.add(30, 'minutes');
-    const formattedDate = futureDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+function createPayment(name, price, time) {
+    const formattedDate = time.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
     return {
         transaction_amount: price,
