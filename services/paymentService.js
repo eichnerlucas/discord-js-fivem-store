@@ -60,18 +60,23 @@ module.exports = {
         try {
             const payment_id = req.data.id;
 
-            if (!payment_id || req.action === "payment.created") {
+            if (! payment_id || req.action === "payment.created") {
                 return null;
             }
 
             const payment = await paymentRepository.findById(payment_id)
 
+            if (! payment) {
+                console.log('Payment not found, returning...');
+                return;
+            }
+
             const paymentMP = await mercadopago.payment.findById(payment_id);
 
-            // if (paymentReq.response.status === "pending") {
-            //     console.log('Payment is pending, returning...');
-            //     return;
-            // }
+            if (! paymentMP || paymentMP.response.status === "pending") {
+                console.log('Payment not found in MP API or is pending, returning...');
+                return;
+            }
 
             const discordId = payment[0].discord_id;
             const script = payment[0].script;

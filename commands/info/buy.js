@@ -20,20 +20,27 @@ module.exports = {
       if (!args[0]) {
         return message.channel.send({ embeds: [erro] });
       }
-      // if ( message.guild.channels.cache.find(channel => channel.name === `ticket-${message.author.id}`) ) {
-      //     return message.reply('Você já tem um ticket criado, feche o antigo para abrir um novo!');
-      // }
+
       const script = await scriptRepository.findByName(args[0]);
-  
+
       if (!script) {
         return message.channel.send(`:x: **Este script não existe!**`);
       }
+      
       let everyoneRole = await message.guild.roles.cache.find(
         (r) => r.name === "@everyone"
       );
       let equipeRole = await message.guild.roles.cache.find(
         (r) => r.name === "Equipe"
       );
+
+      const parentName = 'tickets';
+      const parent = message.guild.channels.cache.find(
+        (channel) => channel.type === 'GUILD_CATEGORY' && channel.name.toLowerCase() === parentName
+      );
+      if (! parent) {
+        console.log('Erro: O parent com o nome de tickets não foi encontrado. O ticket será criado sem parent.')
+      }
       message.guild.channels
         .create(`ticket-${message.author.id}`, {
           permissionOverwrites: [
@@ -60,7 +67,7 @@ module.exports = {
             },
           ],
           type: "text",
-          parent: client.config.ticketParentId,
+          parent: parent ? parent : null,
         })
         .then(async (channel) => {
           message.channel.send(`:white_check_mark: **Pedido criado!**`);
@@ -78,7 +85,7 @@ module.exports = {
                 {
                   label: "Pix",
                   description: "Método de Pagamento Brasileiro",
-                  value: "pix",
+                  value: script.name,
                   emoji: pix,
                 },
               ])
@@ -95,23 +102,26 @@ module.exports = {
           const collector = sentMessage.createReactionCollector({ filter });
   
           collector.on('collect', async () => {
-            const newParentID = client.config.ticketParentDeletedId; 
-            const newParent = message.guild.channels.cache.get(newParentID);
-          
-            if (newParent) {
-              await channel.send('**Este ticket será fechado em 1 minuto.**');
-              setTimeout(async () => {
-                await channel.edit({ parent: newParent });
-                await channel.permissionOverwrites.edit(message.author.id, {
-                  SEND_MESSAGES: false,
-                  VIEW_CHANNEL: false,
-                  READ_MESSAGE_HISTORY: false,
-                });
-              }, 60000);
-            } else {
-              console.log('Erro: O novo parent não foi encontrado. O ticket será movido.')
-              await channel.delete();
+            const newParentName = 'tickets-fechados'; // Substitua pelo nome correto do novo parent
+            const newParent = message.guild.channels.cache.find(
+              (channel) => channel.type === 'GUILD_CATEGORY' && channel.name.toLowerCase() === newParentName
+            );
+            
+            if (! newParent) {
+              console.log('Erro: O novo parent não foi encontrado. O ticket será deletado.')
+              return await channel.delete();
             }
+
+            await channel.send('**Este ticket será fechado em 1 minuto.**');
+            setTimeout(async () => {
+              await channel.edit({ parent: newParent });
+              await channel.permissionOverwrites.edit(message.author.id, {
+                SEND_MESSAGES: false,
+                VIEW_CHANNEL: false,
+                READ_MESSAGE_HISTORY: false,
+              });
+              //TODO: cancelar pagamento no banco de dados e no mercadopago!
+            }, 60000);
           });
         });
     } catch (err) {

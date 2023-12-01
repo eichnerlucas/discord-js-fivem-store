@@ -10,7 +10,7 @@ const moneyFormat = require("../../utils/moneyFormat.js");
 
 async function run(interaction) {
     try {
-        const script = await scriptRepository.findByName(interaction.message.embeds[0].title);
+        const script = await scriptRepository.findByName(interaction.values[0]);
     
         if (! script) {
             return interaction.reply({ content: `:x: **Este script não existe!**`, ephemeral: true });
