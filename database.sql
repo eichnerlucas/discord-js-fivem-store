@@ -30,8 +30,9 @@ CREATE TABLE IF NOT EXISTS `payments` (
   `type` varchar(50) DEFAULT NULL,
   `external_ref` varchar(50) DEFAULT NULL,
   `price` float NOT NULL,
+  `expire_date` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Exportação de dados foi desmarcado.
 
@@ -53,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `subs` (
   `discord_id` varchar(50) NOT NULL DEFAULT '0',
   `ip` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Exportação de dados foi desmarcado.
 

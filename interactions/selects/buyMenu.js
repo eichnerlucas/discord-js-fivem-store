@@ -32,7 +32,7 @@ async function run(interaction) {
             interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
         }
     
-        client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, external_ref, script, price, status, type) VALUES (${interaction.user.id}, ${interaction.channelId}, ${res.response.id},"${res.response.external_reference}", "${name}", "${price}","pending", "pix")`)
+        client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, external_ref, script, price, status, type, expire_date) VALUES (${interaction.user.id}, ${interaction.channelId}, ${res.response.id},"${res.response.external_reference}", "${name}", "${price}","pending", "pix", ${payload.date_of_expiration})`)
         const { qr_code, qr_code_base64 } = res.response.point_of_interaction.transaction_data
         const file = new MessageAttachment(new Buffer.from(qr_code_base64, 'base64'), `${payload.external_reference}.png`);
         const embed = new MessageEmbed()
@@ -65,13 +65,8 @@ async function run(interaction) {
 }
 
 function createPayment(name, price) {
-    // Obtenha a data e hora atual com o fuso horário desejado
     const now = moment().tz('America/Sao_Paulo');
-
-    // Adicione 30 minutos à data atual
     const futureDate = now.add(30, 'minutes');
-
-    // Formate a data no formato especificado
     const formattedDate = futureDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
     return {
@@ -90,7 +85,6 @@ function createPayment(name, price) {
     };
 }	
 
-// Export the handler function
 module.exports = {
     customId: "buy-menu",
     run
