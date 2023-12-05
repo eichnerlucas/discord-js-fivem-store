@@ -44,8 +44,8 @@ module.exports = class Database {
     return await this.query(`SELECT * FROM payments WHERE payment_id = ?`, [id]);
   }
 
-  async getAllPaymentsPending() {
-    return await this.query(`SELECT * FROM payments WHERE status = "pending"`);
+  async getAllPixPaymentsPending() {
+    return await this.query(`SELECT * FROM payments WHERE status = "pending" AND type = "pix"`);
   }
 
   async createSubscription(discord_id, script) {

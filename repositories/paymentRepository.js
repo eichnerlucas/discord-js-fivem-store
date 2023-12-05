@@ -6,16 +6,16 @@ module.exports = {
         return payment
     },
 
-    findAllPendingPayments: async () => {
+    findAllPixPaymentsPending: async () => {
         const client = require('../index');
 
-        const payments = await client.db.getAllPaymentsPending();
+        const payments = await client.db.getAllPixPaymentsPending();
         return payments
     },
 
     updateStatus: async (payment_id, status) => {
         const client = require('../index');
-        console.log(payment_id)
+
         return await client.db.updatePaymentStatus(payment_id, status);
     },
 
