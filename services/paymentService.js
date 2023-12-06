@@ -20,33 +20,34 @@ const updateDatabase = async (payment_id, status) => {
     }
 };
 
-// Função para enviar mensagem no canal do Discord
-const sendDiscordMessage = async (channel_id, message) => {
+
+const getBotMessage = async (channel_id) => {
+    const client = require('../index');
+
+    const channel = client.channels.cache.get(channel_id);
+    const messages = await channel.messages.fetch({ limit: 1 });
+    const botMessage = messages.filter(msg => msg.author.id === client.user.id);
+    if (! botMessage) {
+        return channel.send('Não foi possível encontrar a última mensagem enviada pelo bot.');
+    }
+    return botMessage;
+}
+
+const sendDiscordMessage = async (channel_id, discordMessage = '') => {
     try {
-        const client = require('../index');
-
-        const channel = client.channels.cache.get(channel_id);
-
-        const messages = await channel.messages.fetch({ limit: 1 });
-
-        const botMessage = messages.filter(msg => msg.author.id === client.user.id);
-
-        if (! botMessage) {
-            return message.reply('Não foi possível encontrar a última mensagem enviada pelo bot.');
-        }
-
-        const embed = MessageEmbed("**Pagamento aprovado!**", "success", message);
+        const botMessage = await getBotMessage(channel_id);
+        const embed = MessageEmbed.create("**Pagamento aprovado!**", "success", discordMessage);
         await botMessage.edit({ embeds: [embed], files: [], components: [] });
-        console.log('Discord message sent:', message);
+        console.log('Discord message sent:', discordMessage);
     } catch (error) {
         console.error('Error sending Discord message:', error);
         throw error;
     }
 };
 
-const createSubscription = (discord_id, script) => {
+const createSubscription = async (discord_id, script) => {
     try {
-        subsRepository.createSubscription(discord_id, script);
+        await subsRepository.createSubscription(discord_id, script);
         console.log('Subscription created:', script);
     } catch (error) {
         console.error('Error creating subscription:', error);
@@ -73,7 +74,7 @@ module.exports = {
 
             const paymentMP = await mercadopago.payment.findById(payment_id);
 
-            if (! paymentMP || paymentMP.response.status === "pending") {
+            if (! paymentMP || paymentMP.response.status === PaymentStatus.Pending) {
                 console.log('Payment not found in MP API or is pending, returning...');
                 return;
             }
@@ -89,9 +90,9 @@ module.exports = {
 
             discordMessage = discordMessage.replace("${discord_id}", discordId).replace("${script}", script);
 
-            sendDiscordMessage(payment[0].channel_id, paymentMP.response.status);
+            await sendDiscordMessage(payment[0].channel_id, discordMessage);
 
-            createSubscription(discordId, script);
+            await createSubscription(discordId, script);
         } catch (error) {
             throw error;
         }

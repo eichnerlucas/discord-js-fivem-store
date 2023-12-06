@@ -2,7 +2,6 @@ const cron = require('node-cron');
 const moment = require('moment');
 const paymentRepository = require('../repositories/paymentRepository');
 
-const STATUS_CANCELLED = 'cancelled';
 
 async function handleExpiredPayments() {
     const payments = await paymentRepository.findAllPixPaymentsPending();
@@ -14,7 +13,7 @@ async function handleExpiredPayments() {
 
         const expirationDate = moment(payment.expire_date);
         if (now.isAfter(expirationDate)) {
-            paymentRepository.updateStatus(payment.payment_id, STATUS_CANCELLED);
+            paymentRepository.updateStatus(payment.payment_id, PaymentStatus.Pending);
             paymentsCount++;
         }
     });

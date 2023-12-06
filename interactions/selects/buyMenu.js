@@ -8,7 +8,6 @@ const client = require("../../index");
 const MessageEmbedUtil = require("../../utils/MessageEmbed.js");
 const moneyFormat = require("../../utils/moneyFormat.js");
 
-
 function generateError(ResponseInteraction, errorMessage) {
     const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", errorMessage);
     ResponseInteraction.editReply({ embeds: [errorEmbed], components: [], files: [] })
@@ -24,7 +23,7 @@ function generateSQLQuery(interaction, res, productName, productPrice, payload) 
       "${res.response.external_reference}", 
       "${productName}", 
       "${productPrice}",
-      "pending", 
+      "${PaymentStatus.Pending}", 
       "pix", 
       "${payload.date_of_expiration}"
   );`;
