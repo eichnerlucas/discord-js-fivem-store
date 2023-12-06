@@ -5,6 +5,42 @@ const {
 const scriptRepository = require("../../repositories/scriptRepository");
 const MessageEmbedUtil = require("../../utils/MessageEmbed");
 
+const findRole = async (guild, roleName) => {
+  return await guild.roles.cache.find((r) => r.name === roleName);
+}
+
+const findChannel = (guild, channelTypeName, channelName) => {
+  return guild.channels.cache.find(
+      (channel) => channel.type === channelTypeName && channel.name.toLowerCase() === channelName
+  );
+}
+
+const createPermissionOverwrites = (userId, roleId, deny = []) => {
+  return [
+    {
+      id: userId,
+      allow: [
+        "SEND_MESSAGES",
+        "VIEW_CHANNEL",
+        "READ_MESSAGE_HISTORY",
+      ],
+    },
+    {
+      id: roleId,
+      allow: [
+        "VIEW_CHANNEL",
+        "SEND_MESSAGES",
+        "READ_MESSAGE_HISTORY",
+        "MANAGE_MESSAGES",
+      ],
+    },
+    {
+      id: userId,
+      deny,
+    },
+  ];
+}
+
 module.exports = {
   name: "buy",
   aliases: ["comprar"],
@@ -26,49 +62,19 @@ module.exports = {
       if (!script) {
         return message.channel.send(`:x: **Este script não existe!**`);
       }
-      
-      let everyoneRole = await message.guild.roles.cache.find(
-        (r) => r.name === "@everyone"
-      );
-      let equipeRole = await message.guild.roles.cache.find(
-        (r) => r.name === "Equipe"
-      );
 
-      const parentName = 'tickets';
-      const parent = message.guild.channels.cache.find(
-        (channel) => channel.type === 'GUILD_CATEGORY' && channel.name.toLowerCase() === parentName
-      );
+      let equipeRole = await findRole(message.guild, "Equipe");
+
+      const parent = findChannel(message.guild, 'GUILD_CATEGORY', 'tickets');
       if (! parent) {
         console.log('Erro: O parent com o nome de tickets não foi encontrado. O ticket será criado sem parent.')
       }
       message.guild.channels
-        .create(`ticket-${message.author.id}`, {
-          permissionOverwrites: [
-            {
-              id: message.author.id,
-              allow: [
-                "SEND_MESSAGES",
-                "VIEW_CHANNEL",
-                "READ_MESSAGE_HISTORY",
-              ],
-            },
-            {
-              id: equipeRole.id,
-              allow: [
-                "VIEW_CHANNEL",
-                "SEND_MESSAGES",
-                "READ_MESSAGE_HISTORY",
-                "MANAGE_MESSAGES",
-              ],
-            },
-            {
-              id: everyoneRole.id,
-              deny: ["VIEW_CHANNEL"],
-            },
-          ],
-          type: "text",
-          parent: parent ? parent : null,
-        })
+          .create(`ticket-${message.author.id}`, {
+            permissionOverwrites: createPermissionOverwrites(message.author.id, equipeRole.id, ["VIEW_CHANNEL"]),
+            type: "text",
+            parent: parent || null,
+          })
         .then(async (channel) => {
           message.channel.send(`:white_check_mark: **Pedido criado!** <#${channel.id}>`);
           let pix = message.guild.emojis.cache?.find(
@@ -102,11 +108,8 @@ module.exports = {
           const collector = sentMessage.createReactionCollector({ filter });
   
           collector.on('collect', async () => {
-            const newParentName = 'tickets-fechados'; // Substitua pelo nome correto do novo parent
-            const newParent = message.guild.channels.cache.find(
-              (channel) => channel.type === 'GUILD_CATEGORY' && channel.name.toLowerCase() === newParentName
-            );
-            
+            const newParent = findChannel(message.guild, 'GUILD_CATEGORY', 'tickets-fechados');
+
             if (! newParent) {
               console.log('Erro: O novo parent não foi encontrado. O ticket será deletado.')
               return await channel.delete();

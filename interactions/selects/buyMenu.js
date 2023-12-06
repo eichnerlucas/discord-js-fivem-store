@@ -8,10 +8,32 @@ const client = require("../../index");
 const MessageEmbedUtil = require("../../utils/MessageEmbed.js");
 const moneyFormat = require("../../utils/moneyFormat.js");
 
+
+function generateError(ResponseInteraction, errorMessage) {
+    const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", errorMessage);
+    ResponseInteraction.editReply({ embeds: [errorEmbed], components: [], files: [] })
+}
+
+// Function to  generate SQL Query
+function generateSQLQuery(interaction, res, productName, productPrice, payload) {
+    return `INSERT INTO payments (discord_id, channel_id, payment_id, external_ref, 
+      script, price, status, type, expire_date) VALUES (
+      ${interaction.user.id}, 
+      ${interaction.channelId}, 
+      ${res.response.id},
+      "${res.response.external_reference}", 
+      "${productName}", 
+      "${productPrice}",
+      "pending", 
+      "pix", 
+      "${payload.date_of_expiration}"
+  );`;
+}
+
 async function run(interaction) {
     try {
         const script = await scriptRepository.findByName(interaction.values[0]);
-    
+
         if (! script) {
             return interaction.reply({ content: `:x: **Este script não existe!**`, ephemeral: true });
         }
@@ -26,13 +48,13 @@ async function run(interaction) {
         const payload = createPayment(name, price)
 
         const res = await mercadopago.payment.create(payload)
-    
-        if (! res) {
-            const errorEmbed = MessageEmbedUtil.create("Erro ao Gerar Pedido", "error", `Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error.cause[0].description}\`\``);
-            interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
+
+
+        if (!res) {
+            return generateError(interaction,`Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\\n\\n\\${error.cause[0].description}`)
         }
-    
-        client.db.query(`INSERT INTO payments (discord_id, channel_id, payment_id, external_ref, script, price, status, type, expire_date) VALUES (${interaction.user.id}, ${interaction.channelId}, ${res.response.id},"${res.response.external_reference}", "${name}", "${price}","pending", "pix", "${payload.date_of_expiration}");`)
+        const constructedSQLQuery = generateSQLQuery(interaction, res, name, price, payload);
+        client.db.query(constructedSQLQuery);
         const { qr_code, qr_code_base64 } = res.response.point_of_interaction.transaction_data
         const file = new MessageAttachment(new Buffer.from(qr_code_base64, 'base64'), `${payload.external_reference}.png`);
         const embed = new MessageEmbed()
@@ -51,27 +73,21 @@ async function run(interaction) {
                     .setDisabled(false)
                     .setEmoji('🚫')
             );
-    
-        const buttonData = {
-            paymentId: res.response.id,
-        };
 
-        client.interactionsData.set(`cancel-pix:${interaction.message.channelId}`, buttonData);
+        client.interactionsData.set(`cancel-pix:${interaction.message.channelId}`, { paymentId: res.response.id });
         await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
     } catch (error) {
-        const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\`\`${error}\`\`**`);
-        interaction.editReply({ embeds: [errorEmbed], components: [], files: [] })
+        generateError(interaction, `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\n${error}\n**`);
     }
 }
 
-function createPayment(name, price) {
-    const now = moment().tz('America/Sao_Paulo');
-    const futureDate = now.add(30, 'minutes');
+function createPayment(productName, productPrice) {
+    const futureDate = moment().tz('America/Sao_Paulo').add(30, 'minutes');
     const formattedDate = futureDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
     return {
-        transaction_amount: price,
-        description: name,
+        transaction_amount: productPrice,
+        description: productName,
         payment_method_id: 'pix',
         external_reference: randString(20),
         date_of_expiration: formattedDate,
