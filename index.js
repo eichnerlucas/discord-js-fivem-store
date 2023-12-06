@@ -1,17 +1,16 @@
-const { Client, Collection, MessageEmbed } = require("discord.js");
+const { Client, Collection } = require("discord.js");
 const express = require('express');
 const bodyParser = require('body-parser');
-const paymentService = require('./services/paymentService.js');
 const Database = require('./database.js');
 const config = require('./config.json');
-const MessageEmbedUtil = require('./utils/MessageEmbed.js');
-const app = express()
-const port = 80
 const expiredPayments = require('./schedules/expiredPayments.js');
+const notificationRoutes = require('./routes/notificationRoutes');
 
-// Configurar o middleware Body Parser
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+
+// Initialize express app and port from environment variable or default value
+const app = express();
+// Default to HTTP Port if not specified
+const port = process.env.PORT || 80;
 
 const client = new Client({
     intents: 32767,
@@ -22,7 +21,7 @@ client.commands = new Collection();
 client.interactions = new Collection();
 client.interactionsData = new Collection();
 client.slashCommands = new Collection();
-client.config = require("./config.json");
+client.config = config;
 
 const databaseData = {
     host: config.database.host,
@@ -36,19 +35,13 @@ client.db = new Database(databaseData); //Inicia a database, e salva ela no clie
 // Initializing the project
 require("./handler")(client);
 
-app.post('/notifications', async (req, res) => {
-    try {
-        const { body } = req;
-        paymentService.handleNotification(body);
-        res.send('Ok');
-    } catch (error) {
-        const embed = MessageEmbedUtil.create("**Erro ao processar webhook**","error", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
-        client.channels.cache.get(client.config.adminChannel).send({embeds: [embed]});
-        res.status(500).send('Internal Server Error');
-    }
-})
 
-expiredPayments()
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use('/notifications', notificationRoutes);
+
+expiredPayments();
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 

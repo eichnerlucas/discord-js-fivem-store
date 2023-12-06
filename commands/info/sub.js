@@ -22,20 +22,24 @@ module.exports = {
   name: "sub",
   aliases: ['sub'],
   run: async (client, message, args) => {
-    if (!checkPermission(client, message) || !checkArgs(args)) {
-      return;
-    }
-    const commandHandlers = {
-      "add": handleAdd,
-      "remove": handleRemove,
-      "list": handleList
-    };
-    const handler = commandHandlers[args[0]];
+    try {
+      if (!checkPermission(client, message) || !checkArgs(args)) {
+        return;
+      }
+      const commandHandlers = {
+        "add": handleAdd,
+        "remove": handleRemove,
+        "list": handleList
+      };
+      const handler = commandHandlers[args[0]];
 
-    if (!handler) {
-      return handleUnrecognizedCommand(message, args);
+      if (!handler) {
+        return handleUnrecognizedCommand(message, args);
+      }
+      await handler(message, args);
+    } catch (err) {
+      console.log(err)
     }
-    await handler(message, args);
   }
 };
 

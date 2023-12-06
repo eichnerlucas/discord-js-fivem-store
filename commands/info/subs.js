@@ -1,27 +1,25 @@
-
 const subsRepository = require('../../repositories/subsRepository.js');
 const MessageEmbedUtil = require('../../utils/MessageEmbed.js');
 
+function createField(script) {
+    return {
+        name: `Nome:  ${script.script}`,
+        value: `IP: ${script.ip || 'Nenhum'}`,
+    };
+}
+
 module.exports = {
-    name: "subs",
+    name: 'subs',
     aliases: ['subs'],
-    /**
-     *
-     * @param {Client} client
-     * @param {Message} message
-     * @param {String[]} args
-     */
     run: async (client, message, args) => {
         const subscriptions = await subsRepository.findByDiscordId(message.author.id);
-        
-        if (! subscriptions)
+
+        if (!subscriptions)
             return message.channel.send(":x: **Nenhuma assinatura encontrada!**");
-        
-        const fields = subscriptions.map((script) => ({
-            name: "Nome:  " + script.script,
-            value: "IP: " + (script.ip ? script.ip : "Nenhum")
-        }));
-        const embed = MessageEmbedUtil.create("Assinaturas", null, null, fields);
+
+        const fields = subscriptions.map(createField);
+
+        const embed = MessageEmbedUtil.create('Assinaturas', null, null, fields);
         return message.channel.send({embeds: [embed]});
-    }
-}
+    },
+};
