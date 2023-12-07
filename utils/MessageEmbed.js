@@ -1,27 +1,38 @@
-const { MessageEmbed } = require('discord.js');
+const {MessageEmbed} = require('discord.js');
+
+const COLORS = {
+    SUCCESS: 0x00ae86,
+    ERROR: 0xAE0028
+};
+
+const AUTHOR = {
+    NAME: 'Discord Store',
+    ICON_URL: 'https://i.imgur.com/AfFp7pu.png'
+};
 
 module.exports = {
     create: (title, type = "success", description = null, fields = null) => {
         const embed = new MessageEmbed()
             .setTitle(title)
-            .setColor(0x00ae86)
-            .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png' })
-            .setTimestamp();
+            .setAuthor({name: AUTHOR.NAME, iconURL: AUTHOR.ICON_URL})
+            .setTimestamp()
+            .setColor(type === 'error' ? COLORS.ERROR : COLORS.SUCCESS);
 
-        if (type === 'error') {
-            embed.setColor(0xAE0028);
-        }
-
-        // Adiciona a descrição apenas se ela for fornecida
-        if (description) {
-            embed.setDescription(description);
-        }
-
-        // Adiciona os campos apenas se eles forem fornecidos
-        if (fields) {
-            embed.addFields(fields);
-        }
+        addDescriptionIfProvided(embed, description);
+        addFieldsIfProvided(embed, fields);
 
         return embed;
+    }
+}
+
+function addDescriptionIfProvided(embed, description) {
+    if (description) {
+        embed.setDescription(description);
+    }
+}
+
+function addFieldsIfProvided(embed, fields) {
+    if (fields) {
+        embed.addFields(fields);
     }
 }
