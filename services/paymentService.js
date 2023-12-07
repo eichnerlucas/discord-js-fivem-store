@@ -2,6 +2,7 @@ const mercadopago = require("../utils/mercadopago");
 const paymentRepository = require("../repositories/paymentRepository");
 const subsRepository = require("../repositories/subsRepository");
 const MessageEmbed = require("../utils/MessageEmbed");
+const PaymentStatus = require("../utils/paymentStatus");
 
 const discordMessages = {
     approved: "<@${discord_id}>, seu pagamento já foi encontrado e sua licença para o script **${script}** já foi gerada, para verificar utilize o comando **!subs**.",
@@ -77,6 +78,10 @@ module.exports = {
             if (! paymentMP || paymentMP.response.status === PaymentStatus.Pending) {
                 console.log('Payment not found in MP API or is pending, returning...');
                 return;
+            }
+
+            if (paymentMP.response.status === PaymentStatus.Cancelled) {
+                await mercadopago.payment.cancel(payment_id)
             }
 
             const discordId = payment[0].discord_id;

@@ -2,15 +2,13 @@ module.exports = {
     findById: async (id) => {
         const client = require('../index');
 
-        const payment = await client.db.getPaymentById(id);
-        return payment
+        return await client.db.getPaymentById(id)
     },
 
     findAllPixPaymentsPending: async () => {
         const client = require('../index');
 
-        const payments = await client.db.getAllPixPaymentsPending();
-        return payments
+        return await client.db.getAllPixPaymentsPending()
     },
 
     updateStatus: async (payment_id, status) => {

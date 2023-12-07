@@ -3,13 +3,12 @@ module.exports = {
         const client = require('../index');
 
         const script = await client.db.getScriptByName(name);
-        return script
+        return script[0]
     },
 
     findAll: async () => {
         const client = require('../index');
-        
-        const scripts = await client.db.getAllScripts();
-        return scripts
+
+        return await client.db.getAllScripts()
     },
 };

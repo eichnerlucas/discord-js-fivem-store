@@ -77,10 +77,8 @@ module.exports = {
           })
         .then(async (channel) => {
           message.channel.send(`:white_check_mark: **Pedido criado!** <#${channel.id}>`);
-          let pix = message.guild.emojis.cache?.find(
-            (emoji) => emoji.name === "pix"
-          );
-          pix ? pix : '💰';
+          let pix = message.guild.emojis.cache?.find((emoji) => emoji.name === "pix") || '💰';
+
           let helpMenu = new MessageActionRow().addComponents(
             new MessageSelectMenu()
               .setCustomId("buy-menu")

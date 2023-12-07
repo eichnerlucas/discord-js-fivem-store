@@ -7,6 +7,7 @@ const scriptRepository = require("../../repositories/scriptRepository.js");
 const client = require("../../index");
 const MessageEmbedUtil = require("../../utils/MessageEmbed.js");
 const moneyFormat = require("../../utils/moneyFormat.js");
+const PaymentStatus = require("../../utils/paymentStatus");
 
 function generateError(ResponseInteraction, errorMessage) {
     const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", errorMessage);

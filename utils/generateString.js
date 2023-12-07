@@ -1,5 +1,5 @@
-var crypto = require('crypto');
-var base64url = require('base64url');
+const crypto = require('crypto');
+const base64url = require('base64url');
 
 function randomStringAsBase64Url(size) {
     return base64url(crypto.randomBytes(size));

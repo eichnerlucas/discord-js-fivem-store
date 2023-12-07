@@ -3,3 +3,5 @@ const PaymentStatus = Object.freeze({
     Approved: 'approved',
     Cancelled: 'cancelled'
 });
+
+module.exports = PaymentStatus

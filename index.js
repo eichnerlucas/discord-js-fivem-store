@@ -10,7 +10,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 // Initialize express app and port from environment variable or default value
 const app = express();
 // Default to HTTP Port if not specified
-const port = process.env.PORT || 80;
+const port = 80;
 
 const client = new Client({
     intents: 32767,
