@@ -1,11 +1,16 @@
-const client = require("../index");
+const discordClient = require("../index");
+const ERROR_MESSAGE = 'Erro ao executar o comando.';
 
-client.on('interactionCreate', async (interaction) => {
-    const { customId }  = interaction;
+const handleInteractionError = async (interaction, error) => {
+    console.error(error);
+    await interaction.reply({content: ERROR_MESSAGE, ephemeral: true});
+};
+
+discordClient.on('interactionCreate', async (interaction) => {
+    const {customId} = interaction;
     try {
-    	await client.interactions.get(customId).run(interaction);
+        await discordClient.interactions.get(customId).run(interaction);
     } catch (error) {
-    	console.error(error);
-    	await interaction.reply({ content: 'Erro ao executar o comando.', ephemeral: true });
+        await handleInteractionError(interaction, error);
     }
 });

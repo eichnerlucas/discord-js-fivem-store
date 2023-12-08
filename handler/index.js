@@ -1,39 +1,40 @@
-const { glob } = require("glob");
-const { promisify } = require("util");
-const { Client } = require("discord.js");
-
+const {glob} = require('glob');
+const {promisify} = require('util');
 const globPromise = promisify(glob);
 
-/**
- * @param {Client} client
+function retrieveDirectoryName(path) {
+    const pathParts = path.split('/');
+    return pathParts[pathParts.length - 2];
+}
+
+async function loadFiles(client, path, callback) {
+    const files = await globPromise(`${process.cwd()}/${path}`);
+    return files.map(callback);
+}
+
+function handleCommand(client, path) {
+    const file = require(path);
+    const directory = retrieveDirectoryName(path);
+    if (file.name) {
+        const properties = {directory, ...file};
+        client.commands.set(file.name, properties);
+    }
+}
+
+function handleInteraction(client, path) {
+    const file = require(path);
+    if (file.customId) {
+        console.log(`Loading interaction: ${file.customId}`);
+        client.interactions.set(file.customId, file);
+    }
+}
+
+/*
+ * Exported function now with extracted functions,
+ * explict intent, and reduced boilerplate.
  */
 module.exports = async (client) => {
-    // Commands
-    const commandFiles = await globPromise(`${process.cwd()}/commands/**/*.js`);
-    commandFiles.map((value) => {
-        const file = require(value);
-        const splitted = value.split("/");
-        const directory = splitted[splitted.length - 2];
-
-        if (file.name) {
-            const properties = { directory, ...file };
-            client.commands.set(file.name, properties);
-        }
-    });
-
-    // Events
-    const eventFiles = await globPromise(`${process.cwd()}/events/*.js`);
-    eventFiles.map((value) => require(value));
-
-    // Buttons (ou outros elementos de interação com customId)
-    const interactionFiles = await globPromise(`${process.cwd()}/interactions/**/*.js`);
-    interactionFiles.map((value) => {
-    const file = require(value);
-
-    if (file.customId && file.customId) {
-        console.log(`Loading interaction: ${file.customId}`)
-      client.interactions.set(file.customId, file);
-    }
-  });
-
+    await loadFiles(client, 'commands/**/*.js', (path) => handleCommand(client, path));
+    await loadFiles(client, 'events/*.js', require);
+    await loadFiles(client, 'interactions/**/*.js', (path) => handleInteraction(client, path));
 };
