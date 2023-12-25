@@ -64,7 +64,7 @@ async function handleScriptFile(fileUrl, scriptName) {
             fs.createWriteStream(targetPath)
         );
     } catch (error) {
-        console.error('Something went wrong in script file handling:', error.stack);
+        console.error('Algo deu errado ao criar o arquivo:', error.stack);
         throw error;
     }
 }
