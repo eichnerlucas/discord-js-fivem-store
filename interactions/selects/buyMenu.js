@@ -8,6 +8,7 @@ const client = require("../../index");
 const MessageEmbedUtil = require("../../utils/MessageEmbed.js");
 const moneyFormat = require("../../utils/moneyFormat.js");
 const PaymentStatus = require("../../utils/paymentStatus");
+const client = require("../../index");
 
 function generateError(ResponseInteraction, errorMessage) {
     const errorEmbed = MessageEmbedUtil.create("**Erro ao Gerar Pedido**", "error", errorMessage);
@@ -76,6 +77,8 @@ async function run(interaction) {
 
         client.interactionsData.set(`cancel-pix:${interaction.message.channelId}`, { paymentId: res.response.id });
         await interaction.editReply({ embeds: [embed], files: [file], components: [button] })
+        //send message to the interaction channelId
+        await client.channels.cache.get(interaction.channelId).send(qr_code);
     } catch (error) {
         generateError(interaction, `**Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\n\n${error}\n**`);
     }
@@ -86,7 +89,7 @@ function createPayment(productName, productPrice) {
     const formattedDate = futureDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
     return {
-        transaction_amount: productPrice,
+        transaction_amount: Number(productPrice),
         description: productName,
         payment_method_id: 'pix',
         external_reference: randString(20),
@@ -97,7 +100,8 @@ function createPayment(productName, productPrice) {
                 type: 'CPF',
                 number: '48913238098'
             },
-        }
+        },
+        notification_url: client.config.mercadopago.notification_url,
     };
 }	
 
