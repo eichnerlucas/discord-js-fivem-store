@@ -11,13 +11,14 @@ const AUTHOR = {
 };
 
 module.exports = {
-    create: (title, type = "success", description = null, fields = null) => {
+    create: (title, type = "success", description = null, fields = null, image = null) => {
         const embed = new MessageEmbed()
             .setTitle(title)
             .setAuthor({name: AUTHOR.NAME, iconURL: AUTHOR.ICON_URL})
             .setTimestamp()
             .setColor(type === 'error' ? COLORS.ERROR : COLORS.SUCCESS);
 
+        addImageIfProvided(embed, image)
         addDescriptionIfProvided(embed, description);
         addFieldsIfProvided(embed, fields);
 
@@ -34,5 +35,11 @@ function addDescriptionIfProvided(embed, description) {
 function addFieldsIfProvided(embed, fields) {
     if (fields) {
         embed.addFields(fields);
+    }
+}
+
+function addImageIfProvided(embed, image) {
+    if (image) {
+        embed.setImage(image)
     }
 }

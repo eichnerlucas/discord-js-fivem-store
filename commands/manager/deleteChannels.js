@@ -17,8 +17,7 @@ module.exports = {
     },
 
     run: async function(client, message, args) {
-        const categoryId = '870979800532140114';
-        const category = message.guild.channels.cache.get(categoryId);
+        const category = message.guild.channels.cache.get(client.config.ticketParentId);
         if (!category || category.type !== 'GUILD_CATEGORY') {
             return message.reply('Categoria não encontrada.');
         }
