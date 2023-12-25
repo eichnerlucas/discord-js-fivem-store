@@ -3,7 +3,7 @@ const MessageEmbedUtil = require("../../utils/MessageEmbed");
 const scriptRepository = require("../../repositories/scriptRepository");
 
 function checkPermission(client, message) {
-  if (!client.config.donos.includes(message.author.id)) {
+  if (!client.config.owners.includes(message.author.id)) {
     message.reply("você não é um dos meus criadores!");
     return false;
   }
