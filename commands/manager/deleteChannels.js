@@ -10,13 +10,13 @@ module.exports = {
         }
     },
 
-    async deleteChannelsInCategory(category) {
+    deleteChannelsInCategory: async function(category) {
         for (let channel of category.children.values()) {
             await this.deleteChannel(channel);
         }
     },
 
-    run: async (client, message, args) => {
+    run: async function(client, message, args) {
         const categoryId = '870979800532140114';
         const category = message.guild.channels.cache.get(categoryId);
         if (!category || category.type !== 'GUILD_CATEGORY') {

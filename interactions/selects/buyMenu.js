@@ -37,18 +37,20 @@ async function run(interaction) {
         if (! script) {
             return interaction.reply({ content: `:x: **Este script não existe!**`, ephemeral: true });
         }
-    
+
         await interaction.deferUpdate()
-    
-        await interaction.message.edit({ components: [] })
+
+        const errorEmbed = MessageEmbedUtil.create("**Sucesso**", "success", "Obrigado por criar o pedido, agora insira um **email válido** para a compra, o email será utilizado para notificarmos do seu pagamento!");
+        await interaction.editReply({ embeds: [errorEmbed], components: [],  })
+        const userEmail = await requestEmail(interaction).catch(console.error);
+
         const generating = MessageEmbedUtil.create("**Aguarde**", "success", "**Processando pagamento...**");
         await interaction.editReply({ embeds: [generating] })
     
         const { name, price } = script;
-        const payload = createPayment(name, price)
+        const payload = createPayment(name, price, userEmail)
 
         const res = await mercadopago.payment.create(payload)
-
 
         if (!res) {
             return generateError(interaction,`Ocorreu um erro ao realizar seu pedido, informe a um administrador o erro:\\n\\n\\${error.cause[0].description}`)
@@ -60,7 +62,7 @@ async function run(interaction) {
         const embed = new MessageEmbed()
             .setTitle(`**Pagamento Gerado com Sucesso**`)
             .setAuthor({ name: 'Discord Store', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
-            .setDescription(`**Nome do Produto:** \`\`${name}\`\`\n\n**Valor:** \`\`${moneyFormat(price)}\`\`\n\n**Método de Pagamento: ** 💰 Pix\n\n**Código PIX:** \`\`${qr_code}\`\`\n\n**🛈**: O pagamento expira em **30 minutos**, antes de efetuar o pagamento verifique se ele ainda está disponível.`)
+            .setDescription(`**Nome do Produto:** \`\`${name}\`\`\n\n**Email:** \`\`${userEmail}\`\`\n\n**Valor:** \`\`${moneyFormat(price)}\`\`\n\n**Método de Pagamento: ** 💰 Pix\n\n**Código PIX:** \`\`${qr_code}\`\`\n\n**🛈**: O pagamento expira em **30 minutos**, antes de efetuar o pagamento verifique se ele ainda está disponível.`)
             .setColor(0x00ae86)
             .setImage(`attachment://${payload.external_reference}.png`)
             .setTimestamp();
@@ -83,7 +85,7 @@ async function run(interaction) {
     }
 }
 
-function createPayment(productName, productPrice) {
+function createPayment(productName, productPrice, userEmail) {
     const futureDate = moment().tz('America/Sao_Paulo').add(30, 'minutes');
     const formattedDate = futureDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 
@@ -94,15 +96,40 @@ function createPayment(productName, productPrice) {
         external_reference: randString(20),
         date_of_expiration: formattedDate,
         payer: {
-            email: 'ricardina6539@uorak.com',
-            identification: {
-                type: 'CPF',
-                number: '48913238098'
-            },
+            email: userEmail,
         },
         notification_url: client.config.mercadopago.notification_url,
     };
-}	
+}
+
+function validateEmail(email) {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
+let botMessage;
+async function requestEmail(interaction, attempts = 0) {
+    const filter = (m) => m.author.id === interaction.user.id;
+    try {
+        const collected = await interaction.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ['time'] });
+        const userEmail = collected.first().content;
+        const userMessage = collected.first()
+        if (validateEmail(userEmail)) {
+            if (botMessage) await botMessage.delete(); // delete previous bot response.
+            await userMessage.delete();
+            return userEmail;
+        }
+        if (botMessage) {
+            await botMessage.delete(); // delete previous bot response.
+        }
+        await userMessage.delete();
+        botMessage = await interaction.followUp({ content: 'O email inserido é inválido, tente novamente:' });
+        return await requestEmail(interaction, attempts + 1);
+    } catch (error) {
+        await interaction.followUp({ content: 'Você não inseriu um e-mail a tempo!' });
+        throw new Error('Timeout - Email not provided within the stipulated time.');
+    }
+}
 
 module.exports = {
     customId: "buy-menu",
