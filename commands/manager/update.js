@@ -1,6 +1,15 @@
-const fs = require("fs").promises;
+const fs = require('fs');
+const fsPromises = require('fs').promises;
 const request = require("request");
 const path = require("path");
+
+const SCRIPT_NOT_FOUND_MSG = ':x: **Script não encontrado!** '
+const SCRIPT_UPDATE_SUCCESS_MSG = ':white_check_mark: **Script atualizado com sucesso!** '
+const NOT_DEVELOPER_MSG = "Você não é um dos meus desenvolvedores!";
+const USAGE_MSG = ':x: **Use !update <script> <valor> <arquivo>**';
+const ATTACH_FILE_MSG = ':x: **Anexe um arquivo!**';
+
+const FILE_NON_EXISTING = ':x: **Arquivo não encontrado, ele realmente existe?!**';
 
 module.exports = {
     name: "update",
@@ -11,45 +20,58 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, message, args) => {
-        if (!client.config.owners.includes(message.author.id)) return message.reply("You're not one of my developers!");
+        if (!client.config.owners.includes(message.author.id)) return message.reply(NOT_DEVELOPER_MSG);
 
-        let scriptName = args[0];
-        let newPrice = parseFloat(args[1]);
+        const [scriptName, updatedPrice] = extractScriptNameAndPrice(args);
 
-        if (!scriptName || isNaN(newPrice)) {
-            return message.channel.send(':x: **Use !update <script> <valor> <arquivo>**');
+        if (!scriptName || isNaN(updatedPrice)) return message.channel.send(USAGE_MSG);
+
+        if (!await isScriptExists(scriptName, client)) return message.channel.send(SCRIPT_NOT_FOUND_MSG);
+
+        const filePath = path.resolve(process.cwd(), 'files', `${scriptName}.zip`);
+        if (!message.attachments.first()) {
+            return message.channel.send(ATTACH_FILE_MSG);
         }
 
-        let scriptQueryResult = await client.db.getScriptByName(scriptName);
-        if (!scriptQueryResult || scriptQueryResult.length === 0) {
-            return message.channel.send(`:x: **Script not found!** `);
+        if (!await doesFileExist(filePath)) {
+            return message.channel.send(FILE_NON_EXISTING);
         }
 
-        let filePath = path.join(__dirname, 'files', `${scriptName}.zip`);
-        let fileExists = await checkFileExistence(filePath);
-        if (!message.attachments.first() || !fileExists) {
-            return message.channel.send(':x: **Attach the script file!**');
-        }
+        await updateScriptVersionAndPrice(message, updatedPrice, filePath, scriptName, client);
 
-        await deleteFile(filePath);
-        await downloadFile(message.attachments.first().url, filePath);
-        await client.db.query(`UPDATE scripts SET price = ? WHERE name = ?`, [newPrice, scriptName]);
-        return message.channel.send(`:white_check_mark: **Script successfully updated!** `);
+        return message.channel.send(SCRIPT_UPDATE_SUCCESS_MSG);
     },
 };
 
-async function checkFileExistence(filePath) {
+function extractScriptNameAndPrice(args) {
+    let scriptName = args[0];
+    let updatedPrice = parseFloat(args[1]);
+    return [scriptName, updatedPrice];
+}
+
+async function isScriptExists(scriptName, client) {
+    let scriptQueryResult = await client.db.getScriptByName(scriptName);
+    return scriptQueryResult && scriptQueryResult.length !== 0;
+}
+
+async function updateScriptVersionAndPrice(message, updatedPrice, filePath, scriptName, client) {
+    await deleteScriptFile(filePath);
+    await downloadFile(message.attachments.first().url, filePath);
+    await client.db.updateScriptPrice(scriptName, updatedPrice);
+}
+
+async function doesFileExist(filePath) {
     try {
-        await fs.access(filePath);
+        await fsPromises.access(filePath);
         return true;
     } catch {
         return false;
     }
 }
 
-async function deleteFile(filePath) {
+async function deleteScriptFile(filePath) {
     try {
-        await fs.unlink(filePath);
+        await fsPromises.unlink(filePath);
     } catch (err) {
         throw err;
     }

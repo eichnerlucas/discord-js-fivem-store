@@ -16,6 +16,8 @@ const UPDATE_PAYMENTS_STATUS_BY_PAY_ID = `${UPDATE_PAYMENTS_STATUS} WHERE paymen
 const UPDATE_PAYMENTS_STATUS_BY_EXTERNAL_REF = `${UPDATE_PAYMENTS_STATUS} WHERE external_ref = ?`;
 const INSERT_SUBS = `INSERT INTO subs (discord_id, script) VALUES (?, ?)`;
 const DELETE_SUBS = `DELETE FROM subs WHERE discord_id = ? AND script = ?`;
+const INSERT_SCRIPT = `INSERT INTO scripts (name, price) VALUES(?, ?)`;
+const UPDATE_SCRIPT = `UPDATE scripts SET price = ? WHERE name = ?`;
 
 module.exports = class Database {
     constructor(data) {
@@ -39,6 +41,14 @@ module.exports = class Database {
 
     async getAllScripts() {
         return this.executeQueryWithSingleParam(SELECT_SCRIPTS);
+    }
+
+    async createScript(name, price) {
+        return this.executeQueryWithMultipleParams(INSERT_SCRIPT, [name, price])
+    }
+
+    async updateScriptPrice(name, price){
+        return this.executeQueryWithMultipleParams(UPDATE_SCRIPT, [name, price])
     }
 
     async getSubsByDiscordId(discord_id) {
