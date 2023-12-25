@@ -21,7 +21,8 @@ module.exports = {
         const updateEmbed = async (msg) => updateMessageEmbed(msg, fetchPayments, page);
 
         try {
-            const msg = await message.channel.send('Loading payments...');
+            const embed = MessageEmbedUtil.create("Loading payments...", "success")
+            const msg = await message.channel.send({ embeds: [embed]});
             await makeReactions(msg);
             await updateEmbed(msg);
             collector = msg.createReactionCollector({
@@ -71,7 +72,7 @@ async function updateMessageEmbed(msg, fetchPayments, page) {
 
         if (typeof results === 'string') {
             const embed = MessageEmbedUtil.create(EMPTY_PAYMENTS_MSG, "error", "No payments were found for your DiscordId")
-            await msg.edit({embeds: [embed] });
+            await msg.edit({ embeds: [embed] });
             await msg.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
         } else {
             const desc = formatPaymentDescription(results);
