@@ -12,11 +12,9 @@ const PaymentStatus = require("../../utils/paymentStatus");
 const PENDING_PAYMENT_STATUS = PaymentStatus.Pending;
 const PIX_PAYMENT_METHOD = "pix";
 const REQUEST_EMAIL_ERR = "Timeout - Email not provided within the stipulated time.";
-const SUCCESS_MESSAGE = "Sucesso";
 const AGUARDE_MESSAGE = "Aguarde";
 const ERROR_TYPE = "error";
 const SUCCESS_TYPE = "success";
-const EMBED_AUTHOR = { name: "Discord Store", iconURL: "https://i.imgur.com/AfFp7pu.png", url: "https://discord.js.org" };
 const ERROR_TITLE = "**Erro ao Gerar Pedido**";
 
 function generateError(ResponseInteraction, errorMessage) {
@@ -46,7 +44,7 @@ async function run(interaction) {
             return interaction.reply({ content: ":x: **Este script não existe!**", ephemeral: true });
         }
         await interaction.deferUpdate()
-        const successEmbed = MessageEmbedUtil.create(SUCCESS_MESSAGE, SUCCESS_TYPE, "Obrigado por criar o pedido, agora insira um **email válido** para a compra, o email será utilizado para notificarmos do seu pagamento!");
+        const successEmbed = MessageEmbedUtil.create("Insira um email válido!", SUCCESS_TYPE, "Obrigado por criar o pedido, agora insira um **email válido** para a compra, o email será utilizado para notificarmos do seu pagamento!");
         await interaction.editReply({ embeds: [successEmbed], components: [],  });
         const userEmail = await requestEmail(interaction).catch(console.error);
         const generating = MessageEmbedUtil.create(AGUARDE_MESSAGE, SUCCESS_TYPE, "**Processando pagamento...**");
