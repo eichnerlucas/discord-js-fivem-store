@@ -2,9 +2,9 @@ const { Client, Collection } = require("discord.js");
 const express = require('express');
 const bodyParser = require('body-parser');
 const Database = require('./database.js');
-const config = require('./config.json');
 const expiredPayments = require('./schedules/expiredPayments.js');
 const notificationRoutes = require('./routes/notificationRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 
 // Initialize express app and port from environment variable or default value
@@ -21,13 +21,12 @@ client.commands = new Collection();
 client.interactions = new Collection();
 client.interactionsData = new Collection();
 client.slashCommands = new Collection();
-client.config = config;
 
 const databaseData = {
-    host: config.database.host,
-    user: config.database.user,
-    password: config.database.password,
-    database: config.database.name
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME
 }
 
 client.db = new Database(databaseData); //Inicia a database, e salva ela no client
@@ -41,11 +40,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/notifications', notificationRoutes);
 
+app.use('/auth', authRoutes);
+
 expiredPayments();
 
 app.listen(port, () => console.log(`App listening on port ${port}!`))
 
-client.login(client.config.token);
+client.login(process.env.TOKEN);
 
 module.exports = client;
 

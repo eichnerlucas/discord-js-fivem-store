@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
             res.send('Ok');
         } catch(err) {
             const embed = MessageEmbedUtil.create("**Erro ao processar webhook**","error", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
-            client.channels.cache.get(client.config.adminChannel).send({embeds: [embed]});
+            client.channels.cache.get(process.env.ADMIN_CHANNEL_ID).send({embeds: [embed]});
             res.status(500).send('Internal Server Error');
         }
     }

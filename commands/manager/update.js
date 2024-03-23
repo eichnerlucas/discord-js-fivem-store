@@ -20,7 +20,7 @@ module.exports = {
      * @param {String[]} args
      */
     run: async (client, message, args) => {
-        if (!client.config.owners.includes(message.author.id)) return message.reply(NOT_DEVELOPER_MSG);
+        if (process.env.OWNERS !== message.author.id) return message.reply(NOT_DEVELOPER_MSG);
 
         const [scriptName, updatedPrice] = extractScriptNameAndPrice(args);
 

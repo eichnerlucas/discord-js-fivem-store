@@ -28,7 +28,7 @@ module.exports = {
 };
 
 function checkUserPermissions(client, message) {
-    if (!client.config.owners.includes(message.author.id)) {
+    if (process.env.OWNERS !== message.author.id) {
         message.reply(PERMISSION_DENIED_MSG);
         throw new Error(PERMISSION_DENIED_MSG);
     }

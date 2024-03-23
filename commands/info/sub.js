@@ -3,7 +3,7 @@ const MessageEmbedUtil = require("../../utils/MessageEmbed");
 const scriptRepository = require("../../repositories/scriptRepository");
 
 function checkPermission(client, message) {
-  if (!client.config.owners.includes(message.author.id)) {
+  if (process.env.OWNERS !== message.author.id) {
     message.reply("você não é um dos meus criadores!");
     return false;
   }
@@ -23,7 +23,7 @@ module.exports = {
   aliases: ['sub'],
   run: async (client, message, args) => {
     try {
-      if (!checkPermission(client, message) || !checkArgs(args)) {
+      if (!checkPermission(client, message) || !checkArgs(args, message)) {
         return;
       }
       const commandHandlers = {

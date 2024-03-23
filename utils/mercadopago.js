@@ -1,7 +1,6 @@
 const mercadopago = require("mercadopago");
-const config = require("../config.json");
 
-mercadopago.configurations.setAccessToken(config.mercadopago.prod.token);
+mercadopago.configurations.setAccessToken(process.env.MERCADOPAGO_PROD_TOKEN);
 
 
 module.exports = mercadopago;

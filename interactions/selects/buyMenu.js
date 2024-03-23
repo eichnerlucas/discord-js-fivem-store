@@ -101,7 +101,7 @@ function createPayload(productName, productPrice, userEmail, formattedDate) {
         external_reference: randString(20),
         date_of_expiration: formattedDate,
         payer: { email: userEmail, },
-        notification_url: client.config.mercadopago.notification_url,
+        notification_url: process.env.MERCADOPAGO_NOTIFICATION_URL,
     };
 }
 
