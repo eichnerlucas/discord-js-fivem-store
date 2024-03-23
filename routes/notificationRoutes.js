@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
             await paymentService.handleNotification(body);
             res.send('Ok');
         } catch(err) {
-            const embed = MessageEmbedUtil.create("**Erro ao processar webhook**","error", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${err}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
+            const embed = MessageEmbedUtil.create("**Error processing payment**","error", `**Error while processing payment**:\n\n\`\`${err}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
             client.channels.cache.get(process.env.ADMIN_CHANNEL_ID).send({embeds: [embed]});
             res.status(500).send('Internal Server Error');
         }
