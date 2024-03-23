@@ -5,12 +5,13 @@ const MessageEmbedUtil = require('../utils/MessageEmbed');
 const client = require('../index');
 
 router.post('/', async (req, res) => {
+    const client = require('../index');
         try {
             const { body } = req;
             await paymentService.handleNotification(body);
             res.send('Ok');
         } catch(err) {
-            const embed = MessageEmbedUtil.create("**Erro ao processar webhook**","error", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${error}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
+            const embed = MessageEmbedUtil.create("**Erro ao processar webhook**","error", `**Ocorreu um erro ao processar o webhook**:\n\n\`\`${err}\`\` \n\n**Req Body:** \n\n\`\`\`${JSON.stringify(req.body, null, 2)}\`\`\``);
             client.channels.cache.get(process.env.ADMIN_CHANNEL_ID).send({embeds: [embed]});
             res.status(500).send('Internal Server Error');
         }

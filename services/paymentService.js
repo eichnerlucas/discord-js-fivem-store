@@ -63,7 +63,7 @@ module.exports = {
             const payment_id = req.data.id;
 
             if (! payment_id || req.action === "payment.created") {
-                return null;
+                throw new Error('Invalid request body')
             }
 
             const payment = await paymentRepository.findById(payment_id)
@@ -99,6 +99,7 @@ module.exports = {
 
             await createSubscription(discordId, script);
         } catch (error) {
+            console.log(error)
             throw error;
         }
     },
