@@ -2,10 +2,10 @@ const subsRepository = require("../repositories/subsRepository");
 const MessageEmbed = require("../utils/MessageEmbed");
 const IP = require('ip');
 const MessageEmbedUtil = require("../utils/MessageEmbed");
-const client = require("../index");
 
 
 async function checkLicense(ip, discord_id, script_name) {
+    const client = require("../index");
     const license = await subsRepository.findByNameAndDiscordId(script_name, discord_id);
 
     if (!license[0]) {
@@ -16,6 +16,7 @@ async function checkLicense(ip, discord_id, script_name) {
         throw new Error('Invalid IP');
     }
 
+    client.channels.cache.get(process.env.ADMIN_CHANNEL_ID).send({embeds: [MessageEmbed.create("**License Authorized!**", "success", `**Discord ID:**\n\`\`\`${discord_id}\`\`\` \n**IP:**\n\`\`\`${ip}\`\`\` \n**Script:** \n\`\`\`${script_name}\`\`\``)]});
     return license[0]
 }
 
