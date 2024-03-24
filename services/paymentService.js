@@ -46,14 +46,23 @@ const sendDiscordMessage = async (channel_id, discordMessage = '') => {
     }
 };
 
-const createSubscription = async (discord_id, script) => {
+const createSubscription = async (discord_id, script, message) => {
     try {
         await subsRepository.createSubscription(discord_id, script);
+        await addSubscriptionForUserWithRole(message, discord_id, script);
         console.log('Subscription created:', script);
     } catch (error) {
         console.error('Error creating subscription:', error);
         throw error;
     }
+}
+
+async function addSubscriptionForUserWithRole(message, user_id) {
+    let role = message.guild.roles.cache.find(
+        (r) => r.name === "Cliente"
+    );
+    let user = message.guild.members.cache.get(user_id);
+    user.roles.add(role).catch(console.error);
 }
 
 
@@ -97,7 +106,7 @@ module.exports = {
 
             await sendDiscordMessage(payment[0].channel_id, discordMessage);
 
-            await createSubscription(discordId, script);
+            await createSubscription(discordId, script, discordMessage);
         } catch (error) {
             console.log(error)
             throw error;

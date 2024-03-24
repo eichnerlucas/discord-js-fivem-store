@@ -14,7 +14,7 @@ async function handleExpiredPayments() {
 
         const expirationDate = moment(payment.expire_date);
         if (now.isAfter(expirationDate)) {
-            paymentRepository.updateStatus(payment.payment_id, PaymentStatus.Pending);
+            paymentRepository.updateStatus(payment.payment_id, PaymentStatus.Cancelled);
             paymentsCount++;
         }
     });
